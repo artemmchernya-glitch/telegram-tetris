@@ -6,39 +6,81 @@
   <title>Змійка</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    * { box-sizing: border-box; touch-action: manipulation; }
+    * { 
+      box-sizing: border-box; 
+      touch-action: manipulation;
+    }
+
     body {
       margin: 0;
-      background: #17212b;
+      background: linear-gradient(135deg, #17212b 0%, #0a0e1b 100%);
       color: #fff;
-      font-family: sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
+      padding: 10px;
     }
-    #score-board {
-      font-size: 20px;
-      margin-bottom: 10px;
-      font-weight: bold;
+
+    h1 {
+      font-size: 32px;
+      margin: 15px 0;
+      text-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
     }
-    canvas {
-      background: #0e1621;
-      border: 2px solid #5288c1;
+
+    .stats-container {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 15px;
+      width: 100%;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .stat-box {
+      text-align: center;
+      padding: 10px 15px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(76, 175, 80, 0.3);
       border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      min-width: 90px;
     }
+
+    .stat-label {
+      font-size: 11px;
+      color: #888;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 18px;
+      font-weight: bold;
+      color: #4caf50;
+    }
+
+    #canvas {
+      background: #0e1621;
+      border: 3px solid #4caf50;
+      border-radius: 8px;
+      box-shadow: 0 0 25px rgba(76, 175, 80, 0.3);
+      image-rendering: pixelated;
+      max-width: 100%;
+    }
+
     .controls {
       display: grid;
       grid-template-columns: repeat(3, 70px);
       grid-template-rows: repeat(2, 60px);
       gap: 10px;
-      margin-top: 15px;
+      margin-top: 20px;
     }
+
     .btn {
-      background: #2b5278;
-      border: none;
+      background: linear-gradient(135deg, #2b5278 0%, #1a3a52 100%);
+      border: 2px solid #4caf50;
       border-radius: 8px;
       color: white;
       font-size: 24px;
@@ -46,77 +88,507 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     }
-    .btn:active { background: #5288c1; }
+
+    .btn:active {
+      background: #4caf50;
+      color: #000;
+      transform: scale(0.92);
+      box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     .btn-up { grid-column: 2; grid-row: 1; }
     .btn-left { grid-column: 1; grid-row: 2; }
     .btn-down { grid-column: 2; grid-row: 2; }
     .btn-right { grid-column: 3; grid-row: 2; }
+
+    .status-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .status-btn {
+      padding: 12px 24px;
+      background: #4caf50;
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+    }
+
+    .status-btn:active {
+      transform: scale(0.95);
+    }
+
+    .status-btn:hover {
+      background: #5CBF60;
+    }
+
+    .status-btn.secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border: 1px solid #4caf50;
+    }
+
+    .status-btn.secondary:hover {
+      background: rgba(76, 175, 80, 0.2);
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, #1a2332 0%, #0a0e1b 100%);
+      border: 2px solid #4caf50;
+      border-radius: 16px;
+      padding: 40px 30px;
+      text-align: center;
+      box-shadow: 0 0 50px rgba(76, 175, 80, 0.4);
+      animation: slideUp 0.3s ease;
+      max-width: 90%;
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal h1 {
+      font-size: 42px;
+      color: #e53935;
+      margin: 0 0 20px 0;
+      text-shadow: 0 0 20px rgba(229, 57, 53, 0.5);
+    }
+
+    .modal-stats {
+      margin: 30px 0;
+      text-align: left;
+    }
+
+    .modal-stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px;
+      border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+      font-size: 16px;
+    }
+
+    .modal-stat-row:last-child {
+      border-bottom: none;
+    }
+
+    .modal-stat-label {
+      color: #888;
+    }
+
+    .modal-stat-value {
+      font-weight: bold;
+      color: #4caf50;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 30px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .modal-btn {
+      padding: 14px 28px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .modal-btn.restart {
+      background: #4caf50;
+      color: #000;
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .modal-btn.restart:active {
+      transform: scale(0.95);
+    }
+
+    .modal-btn.menu {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border: 1px solid #4caf50;
+      flex: 1;
+      min-width: 150px;
+    }
+
+    /* Difficulty Selection Modal */
+    .difficulty-modal.active {
+      display: flex !important;
+    }
+
+    .difficulty-content {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .difficulty-btn {
+      padding: 20px;
+      background: rgba(76, 175, 80, 0.1);
+      border: 2px solid #4caf50;
+      border-radius: 8px;
+      color: #4caf50;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .difficulty-btn:active {
+      background: #4caf50;
+      color: #000;
+      transform: scale(0.95);
+    }
+
+    /* Particle effect */
+    canvas#particleCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 500;
+    }
+
+    @media (max-width: 500px) {
+      h1 {
+        font-size: 24px;
+      }
+
+      .controls {
+        grid-template-columns: repeat(3, 60px);
+        grid-template-rows: repeat(2, 50px);
+      }
+
+      .btn {
+        font-size: 20px;
+      }
+
+      #canvas {
+        width: 100%;
+        height: auto;
+      }
+
+      .modal-content {
+        padding: 25px 20px;
+      }
+
+      .modal h1 {
+        font-size: 32px;
+      }
+    }
   </style>
 </head>
 <body>
+  <h1>🐍 ЗМІЙКА</h1>
 
-  <div id="score-board">Рахунок: <span id="score">0</span></div>
-  <canvas id="game" width="320" height="320"></canvas>
+  <div class="stats-container">
+    <div class="stat-box">
+      <div class="stat-label">Рахунок</div>
+      <div class="stat-value" id="score">0</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Рекорд</div>
+      <div class="stat-value" id="highScore">0</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Довжина</div>
+      <div class="stat-value" id="length">1</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Рівень</div>
+      <div class="stat-value" id="level">1</div>
+    </div>
+  </div>
 
-  <!-- Кнопки керування для смартфона -->
+  <canvas id="canvas" width="320" height="320"></canvas>
+  <canvas id="particleCanvas"></canvas>
+
   <div class="controls">
-    <button class="btn btn-up" onclick="setDir('UP')">⬆️</button>
-    <button class="btn btn-left" onclick="setDir('LEFT')">⬅️</button>
-    <button class="btn btn-down" onclick="setDir('DOWN')">⬇️</button>
-    <button class="btn btn-right" onclick="setDir('RIGHT')">➡️</button>
+    <button class="btn btn-up" onclick="setDir('UP')" id="btnUp">⬆️</button>
+    <button class="btn btn-left" onclick="setDir('LEFT')" id="btnLeft">⬅️</button>
+    <button class="btn btn-down" onclick="setDir('DOWN')" id="btnDown">⬇️</button>
+    <button class="btn btn-right" onclick="setDir('RIGHT')" id="btnRight">➡️</button>
+  </div>
+
+  <div class="status-buttons">
+    <button class="status-btn" id="pauseBtn" onclick="togglePause()">⏸️ ПАУЗА</button>
+    <button class="status-btn secondary" id="restartBtn" onclick="showDifficultyModal()">🔄 НОВА</button>
+  </div>
+
+  <!-- Game Over Modal -->
+  <div class="modal" id="gameOverModal">
+    <div class="modal-content">
+      <h1>ГРА ЗАКІНЧЕНА</h1>
+      <div class="modal-stats">
+        <div class="modal-stat-row">
+          <span class="modal-stat-label">Фінальний рахунок:</span>
+          <span class="modal-stat-value" id="finalScore">0</span>
+        </div>
+        <div class="modal-stat-row">
+          <span class="modal-stat-label">Рекорд:</span>
+          <span class="modal-stat-value" id="finalHighScore">0</span>
+        </div>
+        <div class="modal-stat-row">
+          <span class="modal-stat-label">Довжина змійки:</span>
+          <span class="modal-stat-value" id="finalLength">1</span>
+        </div>
+        <div class="modal-stat-row" id="newRecordRow" style="display: none; color: #FFD700;">
+          <span>🎉 НОВИЙ РЕКОРД! 🎉</span>
+        </div>
+      </div>
+      <div class="modal-buttons">
+        <button class="modal-btn restart" onclick="showDifficultyModal()">ГРАТИ ЩЕ РАЗ</button>
+        <button class="modal-btn menu" onclick="location.reload()">МЕНЮ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Difficulty Selection Modal -->
+  <div class="modal difficulty-modal" id="difficultyModal">
+    <div class="modal-content">
+      <h1 style="margin-bottom: 30px;">Виберіть рівень складності</h1>
+      <div class="difficulty-content">
+        <button class="difficulty-btn" onclick="startGame('easy')">
+          🟢 ЛЕГКО<br><span style="font-size: 12px; opacity: 0.7;">Повільна швидкість</span>
+        </button>
+        <button class="difficulty-btn" onclick="startGame('medium')">
+          🟡 НОРМАЛЬНО<br><span style="font-size: 12px; opacity: 0.7;">Середня швидкість</span>
+        </button>
+        <button class="difficulty-btn" onclick="startGame('hard')">
+          🔴 ВАЖКО<br><span style="font-size: 12px; opacity: 0.7;">Висока швидкість</span>
+        </button>
+      </div>
+    </div>
   </div>
 
   <script>
     const tg = window.Telegram?.WebApp;
-    if (tg) tg.ready();
+    if (tg) {
+      tg.expand();
+      tg.ready();
+    }
 
-    const canvas = document.getElementById("game");
+    const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
+    const particleCanvas = document.getElementById("particleCanvas");
+    const particleCtx = particleCanvas.getContext("2d");
+    
+    particleCanvas.width = window.innerWidth;
+    particleCanvas.height = window.innerHeight;
+
     const grid = 16;
     const count = canvas.width / grid;
 
     let score = 0;
+    let highScore = localStorage.getItem('snakeHighScore') || 0;
+    document.getElementById('highScore').innerText = highScore;
+
     let snake = [{x: 10, y: 10}];
     let food = {x: 5, y: 5};
     let dx = 1, dy = 0;
     let nextDx = 1, nextDy = 0;
-    
-    // Налаштування швидкості (у мілісекундах)
-    let baseSpeed = 160; // Початкова комфортна швидкість
-    let currentSpeed = baseSpeed;
-    let minSpeed = 60;   // Максимальне прискорення
+    let gameState = 'initial'; // 'initial', 'playing', 'paused', 'gameOver'
     let gameLoopTimeout = null;
+    let currentSpeed = 160;
+    let difficulty = 'medium';
+    let particles = [];
+
+    // Звуки (Web Audio API)
+    function playSound(freq, duration) {
+      try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        oscillator.frequency.value = freq;
+        oscillator.type = 'sine';
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + duration);
+      } catch (e) {
+        // Браузер може не підтримувати Web Audio API
+      }
+    }
+
+    function createParticles(x, y, color) {
+      const particleCount = 8;
+      for (let i = 0; i < particleCount; i++) {
+        const angle = (Math.PI * 2 * i) / particleCount;
+        const velocity = 3 + Math.random() * 2;
+        particles.push({
+          x: x,
+          y: y,
+          vx: Math.cos(angle) * velocity,
+          vy: Math.sin(angle) * velocity,
+          life: 1,
+          color: color
+        });
+      }
+    }
+
+    function updateParticles() {
+      particleCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+      particles = particles.filter(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.1; // gravity
+        p.life -= 0.02;
+        
+        if (p.life > 0) {
+          particleCtx.globalAlpha = p.life;
+          particleCtx.fillStyle = p.color;
+          particleCtx.fillRect(p.x - 2, p.y - 2, 4, 4);
+          return true;
+        }
+        return false;
+      });
+      particleCtx.globalAlpha = 1;
+    }
+
+    function showDifficultyModal() {
+      document.getElementById('gameOverModal').classList.remove('active');
+      document.getElementById('difficultyModal').classList.add('active');
+    }
+
+    function startGame(difficultyLevel) {
+      difficulty = difficultyLevel;
+      document.getElementById('difficultyModal').classList.remove('active');
+      
+      if (difficultyLevel === 'easy') currentSpeed = 200;
+      else if (difficultyLevel === 'medium') currentSpeed = 160;
+      else if (difficultyLevel === 'hard') currentSpeed = 100;
+
+      resetGame();
+    }
 
     function generateFood() {
-      food.x = Math.floor(Math.random() * count);
-      food.y = Math.floor(Math.random() * count);
+      let newFood;
+      do {
+        newFood = {
+          x: Math.floor(Math.random() * count),
+          y: Math.floor(Math.random() * count)
+        };
+      } while (snake.some(segment => segment.x === newFood.x && segment.y === newFood.y));
+      food = newFood;
     }
 
     function setDir(dir) {
+      if (gameState !== 'playing') return;
       if (dir === 'UP' && dy === 0) { nextDx = 0; nextDy = -1; }
       if (dir === 'DOWN' && dy === 0) { nextDx = 0; nextDy = 1; }
       if (dir === 'LEFT' && dx === 0) { nextDx = -1; nextDy = 0; }
       if (dir === 'RIGHT' && dx === 0) { nextDx = 1; nextDy = 0; }
     }
 
-    // Зчитування клавіш на ПК
+    // Клавіатурне керування для ПК
     document.addEventListener("keydown", (e) => {
       if (e.key === "ArrowUp") setDir('UP');
       if (e.key === "ArrowDown") setDir('DOWN');
       if (e.key === "ArrowLeft") setDir('LEFT');
       if (e.key === "ArrowRight") setDir('RIGHT');
+      if (e.key === " ") togglePause();
     });
 
+    // Свайп-керування для мобільних
+    let touchStartX = 0, touchStartY = 0;
+    canvas.addEventListener('touchstart', (e) => {
+      const touch = e.touches[0];
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+    });
+
+    canvas.addEventListener('touchend', (e) => {
+      if (!e.changedTouches.length) return;
+      const touch = e.changedTouches[0];
+      const diffX = touch.clientX - touchStartX;
+      const diffY = touch.clientY - touchStartY;
+      const threshold = 30;
+
+      if (Math.abs(diffX) > Math.abs(diffY)) {
+        if (diffX > threshold) setDir('RIGHT');
+        else if (diffX < -threshold) setDir('LEFT');
+      } else {
+        if (diffY > threshold) setDir('DOWN');
+        else if (diffY < -threshold) setDir('UP');
+      }
+    });
+
+    function togglePause() {
+      if (gameState === 'gameOver') return;
+      if (gameState === 'playing') {
+        gameState = 'paused';
+        document.getElementById('pauseBtn').textContent = '▶️ ПРОДОВЖИТИ';
+      } else if (gameState === 'paused') {
+        gameState = 'playing';
+        document.getElementById('pauseBtn').textContent = '⏸️ ПАУЗА';
+        loop();
+      }
+    }
+
     function resetGame() {
-      alert(`Гра закінчена! Ваш рахунок: ${score}`);
       score = 0;
-      document.getElementById("score").innerText = score;
       snake = [{x: 10, y: 10}];
       dx = 1; dy = 0;
       nextDx = 1; nextDy = 0;
-      currentSpeed = baseSpeed; // Скидаємо швидкість до початкової
+      gameState = 'playing';
+      document.getElementById('pauseBtn').textContent = '⏸️ ПАУЗА';
+      document.getElementById('score').innerText = score;
+      updateStats();
       generateFood();
+      loop();
+    }
+
+    function updateStats() {
+      document.getElementById('length').innerText = snake.length;
+      const level = Math.floor(score / 5) + 1;
+      document.getElementById('level').innerText = level;
     }
 
     function update() {
@@ -131,7 +603,7 @@
         head.y < 0 || head.y >= count ||
         snake.some(segment => segment.x === head.x && segment.y === head.y)
       ) {
-        resetGame();
+        endGame();
         return;
       }
 
@@ -140,12 +612,15 @@
       // Перевірка поїдання їжі
       if (head.x === food.x && head.y === food.y) {
         score += 1;
-        document.getElementById("score").innerText = score;
+        playSound(800, 0.1);
+        createParticles(food.x * grid + grid/2, food.y * grid + grid/2, '#4caf50');
+        document.getElementById('score').innerText = score;
+        updateStats();
         generateFood();
-
-        // Поступове прискорення: кожні 2 ягоди швидкість збільшується на 5 мс
-        if (currentSpeed > minSpeed) {
-          currentSpeed -= 5;
+        
+        // Легке прискорення
+        if (currentSpeed > 50) {
+          currentSpeed -= 2;
         }
       } else {
         snake.pop();
@@ -156,28 +631,65 @@
       ctx.fillStyle = "#0e1621";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Малюємо їжу
+      // Малюємо їжу з сяйвом
       ctx.fillStyle = "#e53935";
+      ctx.shadowColor = "rgba(229, 57, 53, 0.5)";
+      ctx.shadowBlur = 10;
       ctx.fillRect(food.x * grid, food.y * grid, grid - 1, grid - 1);
+      ctx.shadowBlur = 0;
 
       // Малюємо змійку
-      ctx.fillStyle = "#4caf50";
       snake.forEach((segment, index) => {
-        if (index === 0) ctx.fillStyle = "#81c784"; // Голова світліша
-        else ctx.fillStyle = "#4caf50";
+        if (index === 0) {
+          // Голова
+          ctx.fillStyle = "#81c784";
+          ctx.shadowColor = "rgba(129, 199, 132, 0.6)";
+          ctx.shadowBlur = 8;
+        } else {
+          ctx.fillStyle = "#4caf50";
+          ctx.shadowBlur = 0;
+        }
         ctx.fillRect(segment.x * grid, segment.y * grid, grid - 1, grid - 1);
       });
+      ctx.shadowBlur = 0;
     }
 
     function loop() {
-      update();
+      if (gameState === 'playing') {
+        update();
+      }
       draw();
-      // Запускаємо наступний кадр з актуальною затримкою
-      gameLoopTimeout = setTimeout(loop, currentSpeed);
+      updateParticles();
+      
+      if (gameState !== 'paused' && gameState !== 'initial') {
+        gameLoopTimeout = setTimeout(loop, currentSpeed);
+      } else if (gameState !== 'initial') {
+        gameLoopTimeout = setTimeout(loop, 16);
+      }
     }
 
-    // Запуск гри
-    loop();
+    function endGame() {
+      gameState = 'gameOver';
+      const isNewRecord = score > highScore;
+      if (isNewRecord) {
+        highScore = score;
+        localStorage.setItem('snakeHighScore', highScore);
+        playSound(1200, 0.3);
+      } else {
+        playSound(300, 0.3);
+      }
+      
+      document.getElementById('finalScore').innerText = score;
+      document.getElementById('finalHighScore').innerText = highScore;
+      document.getElementById('finalLength').innerText = snake.length;
+      document.getElementById('newRecordRow').style.display = isNewRecord ? 'flex' : 'none';
+      document.getElementById('gameOverModal').classList.add('active');
+    }
+
+    // Показуємо модаль вибору складності при завантаженні
+    window.addEventListener('load', () => {
+      showDifficultyModal();
+    });
   </script>
 </body>
 </html>
