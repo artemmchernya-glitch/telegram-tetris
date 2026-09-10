@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Тетріс</title>
+  <title>Дорогоцінні Камінці</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     * { 
@@ -32,113 +32,78 @@
 
     .game-container {
       display: flex;
-      gap: 20px;
-      align-items: flex-start;
+      flex-direction: column;
+      gap: 15px;
+      align-items: center;
+      width: 100%;
     }
 
     .stats-container {
       display: flex;
-      flex-direction: column;
-      gap: 15px;
+      flex-direction: row;
+      gap: 10px;
       width: 100%;
-      max-width: 280px;
+      justify-content: center;
+      flex-wrap: wrap;
+      max-width: 100%;
     }
 
     .stat-box {
       text-align: center;
-      padding: 15px;
+      padding: 8px;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(76, 175, 80, 0.3);
-      border-radius: 8px;
+      border-radius: 6px;
+      min-width: 70px;
     }
 
     .stat-label {
-      font-size: 11px;
+      font-size: 8px;
       color: #888;
       text-transform: uppercase;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
 
     .stat-value {
-      font-size: 24px;
+      font-size: 14px;
       font-weight: bold;
       color: #4caf50;
     }
 
-    .next-piece {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(76, 175, 80, 0.3);
-      border-radius: 8px;
-      padding: 15px;
-      text-align: center;
-    }
-
-    .next-piece-label {
-      font-size: 11px;
-      color: #888;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-    }
-
-    #nextCanvas {
-      background: #0e1621;
-      border: 1px solid rgba(76, 175, 80, 0.2);
-      border-radius: 4px;
-      display: block;
-      width: 100%;
-      height: 100px;
-    }
-
-    #canvas {
-      background: #0e1621;
+    .game-board {
+      display: grid;
+      grid-template-columns: repeat(6, 50px);
+      grid-gap: 8px;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.3);
       border: 3px solid #4caf50;
       border-radius: 8px;
       box-shadow: 0 0 25px rgba(76, 175, 80, 0.3);
-      image-rendering: pixelated;
     }
 
-    .controls {
-      display: grid;
-      grid-template-columns: repeat(3, 70px);
-      grid-template-rows: repeat(2, 60px);
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-    .btn {
-      background: linear-gradient(135deg, #2b5278 0%, #1a3a52 100%);
-      border: 2px solid #4caf50;
+    .game-cell {
+      width: 50px;
+      height: 50px;
+      border: none;
       border-radius: 8px;
-      color: white;
-      font-size: 24px;
+      cursor: pointer;
+      transition: all 0.1s ease;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      font-size: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(76, 175, 80, 0.3);
     }
 
-    .btn:active {
-      background: #4caf50;
-      color: #000;
-      transform: scale(0.92);
-      box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+    .game-cell:active {
+      transform: scale(0.95);
     }
 
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .btn-up { grid-column: 2; grid-row: 1; }
-    .btn-left { grid-column: 1; grid-row: 2; }
-    .btn-down { grid-column: 2; grid-row: 2; }
-    .btn-right { grid-column: 3; grid-row: 2; }
-
-    .rotation-btn {
-      grid-column: 1 / 4;
-      margin-top: 10px;
+    .game-cell.selected {
+      border: 3px solid #FFD700;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
     }
 
     .status-buttons {
@@ -290,33 +255,11 @@
       min-width: 150px;
     }
 
-    /* Difficulty Selection Modal */
-    .difficulty-content {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-
-    .difficulty-btn {
-      padding: 20px;
-      background: rgba(76, 175, 80, 0.1);
-      border: 2px solid #4caf50;
-      border-radius: 8px;
-      color: #4caf50;
+    /* Moves display */
+    .moves-display {
       font-size: 18px;
       font-weight: bold;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .difficulty-btn:active {
-      background: #4caf50;
-      color: #000;
-      transform: scale(0.95);
-    }
-
-    .difficulty-btn:hover {
-      background: rgba(76, 175, 80, 0.2);
+      color: #FF6B6B;
     }
 
     /* Particle effect */
@@ -333,27 +276,14 @@
         font-size: 24px;
       }
 
-      .game-container {
-        flex-direction: column;
-        gap: 15px;
+      .game-board {
+        grid-template-columns: repeat(5, 45px);
       }
 
-      .stats-container {
-        max-width: 100%;
-      }
-
-      .controls {
-        grid-template-columns: repeat(3, 60px);
-        grid-template-rows: repeat(2, 50px);
-      }
-
-      .btn {
-        font-size: 20px;
-      }
-
-      #canvas {
-        width: 100%;
-        height: auto;
+      .game-cell {
+        width: 45px;
+        height: 45px;
+        font-size: 24px;
       }
 
       .modal-content {
@@ -367,10 +297,10 @@
   </style>
 </head>
 <body>
-  <h1>🟩 ТЕТРІС</h1>
+  <h1>💎 ДОРОГОЦІННІ КАМІНЦІ</h1>
 
   <div class="game-container">
-    <canvas id="canvas" width="200" height="400"></canvas>
+    <div class="game-board" id="gameBoard"></div>
     
     <div class="stats-container">
       <div class="stat-box">
@@ -382,36 +312,25 @@
         <div class="stat-value" id="highScore">0</div>
       </div>
       <div class="stat-box">
-        <div class="stat-label">Лінії</div>
-        <div class="stat-value" id="lines">0</div>
+        <div class="stat-label">Ходи</div>
+        <div class="stat-value moves-display" id="moves">30</div>
       </div>
       <div class="stat-box">
-        <div class="stat-label">Рівень</div>
-        <div class="stat-value" id="level">1</div>
-      </div>
-      <div class="next-piece">
-        <div class="next-piece-label">Наступна фігура</div>
-        <canvas id="nextCanvas" width="100" height="100"></canvas>
+        <div class="stat-label">Комбо</div>
+        <div class="stat-value" id="combo">0x</div>
       </div>
     </div>
   </div>
 
-  <div class="controls">
-    <button class="btn btn-left" onclick="movePiece('LEFT')" id="btnLeft">⬅️</button>
-    <button class="btn btn-down" onclick="movePiece('DOWN')" id="btnDown">⬇️</button>
-    <button class="btn btn-right" onclick="movePiece('RIGHT')" id="btnRight">➡️</button>
-    <button class="btn rotation-btn" onclick="rotatePiece()" id="btnRotate">🔄 ОБЕРТАННЯ</button>
-  </div>
-
   <div class="status-buttons">
-    <button class="status-btn" id="pauseBtn" onclick="togglePause()">⏸️ ПАУЗА</button>
-    <button class="status-btn secondary" id="restartBtn" onclick="showDifficultyModal()">🔄 НОВА</button>
+    <button class="status-btn" id="restartBtn" onclick="startNewGame()">🔄 НОВА ГРА</button>
+    <button class="status-btn secondary" id="undoBtn" onclick="undoMove()">↶ СКАСУВАТИ</button>
   </div>
 
   <!-- Game Over Modal -->
   <div class="modal" id="gameOverModal">
     <div class="modal-content">
-      <h1>ГРА ЗАКІНЧЕНА</h1>
+      <h1>ГОРА ЗАКІНЧЕНА</h1>
       <div class="modal-stats">
         <div class="modal-stat-row">
           <span class="modal-stat-label">Фінальний рахунок:</span>
@@ -422,38 +341,16 @@
           <span class="modal-stat-value" id="finalHighScore">0</span>
         </div>
         <div class="modal-stat-row">
-          <span class="modal-stat-label">Завершених ліній:</span>
-          <span class="modal-stat-value" id="finalLines">0</span>
-        </div>
-        <div class="modal-stat-row">
-          <span class="modal-stat-label">Рівень:</span>
-          <span class="modal-stat-value" id="finalLevel">1</span>
+          <span class="modal-stat-label">Заробив ходів:</span>
+          <span class="modal-stat-value" id="finalMoves">0</span>
         </div>
         <div class="modal-stat-row" id="newRecordRow" style="display: none; color: #FFD700;">
           <span>🎉 НОВИЙ РЕКОРД! 🎉</span>
         </div>
       </div>
       <div class="modal-buttons">
-        <button class="modal-btn restart" onclick="showDifficultyModal()">ГРАТИ ЩЕ РАЗ</button>
+        <button class="modal-btn restart" onclick="startNewGame()">ГРАТИ ЩЕ РАЗ</button>
         <button class="modal-btn menu" onclick="location.reload()">МЕНЮ</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Difficulty Selection Modal -->
-  <div class="modal" id="difficultyModal">
-    <div class="modal-content">
-      <h1 style="margin-bottom: 30px; color: #4caf50;">Виберіть рівень складності</h1>
-      <div class="difficulty-content">
-        <button class="difficulty-btn" id="easyBtn" onclick="startGame('easy')">
-          🟢 ЛЕГКО<br><span style="font-size: 12px; opacity: 0.7;">Повільна швидкість</span>
-        </button>
-        <button class="difficulty-btn" id="mediumBtn" onclick="startGame('medium')">
-          🟡 НОРМАЛЬНО<br><span style="font-size: 12px; opacity: 0.7;">Середня швидкість</span>
-        </button>
-        <button class="difficulty-btn" id="hardBtn" onclick="startGame('hard')">
-          🔴 ВАЖКО<br><span style="font-size: 12px; opacity: 0.7;">Висока швидкість</span>
-        </button>
       </div>
     </div>
   </div>
@@ -467,174 +364,218 @@
       tg.ready();
     }
 
-    // Canvas setup
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
-    const nextCanvas = document.getElementById("nextCanvas");
-    const nextCtx = nextCanvas.getContext("2d");
     const particleCanvas = document.getElementById("particleCanvas");
     const particleCtx = particleCanvas.getContext("2d");
     
     particleCanvas.width = window.innerWidth;
     particleCanvas.height = window.innerHeight;
 
-    // Game settings
-    const COLS = 10;
-    const ROWS = 20;
-    const BLOCK_SIZE = canvas.width / COLS;
-
-    // Colors for tetrominos
+    const COLS = 6;
+    const ROWS = 6;
+    const GEMS = ['💎', '💍', '👑', '🔮', '✨', '🌟'];
     const COLORS = {
-      'I': '#00F0F0',
-      'O': '#F0F000',
-      'T': '#A000F0',
-      'S': '#00F000',
-      'Z': '#F00000',
-      'J': '#0000F0',
-      'L': '#F0A000',
-      'empty': '#0e1621'
-    };
-
-    // Tetromino shapes
-    const TETROMINOS = {
-      'I': [[0,0], [1,0], [2,0], [3,0]],
-      'O': [[0,0], [1,0], [0,1], [1,1]],
-      'T': [[1,0], [0,1], [1,1], [2,1]],
-      'S': [[1,0], [2,0], [0,1], [1,1]],
-      'Z': [[0,0], [1,0], [1,1], [2,1]],
-      'J': [[0,0], [0,1], [1,1], [2,1]],
-      'L': [[2,0], [0,1], [1,1], [2,1]]
+      '💎': '#4caf50',
+      '💍': '#FF6B9D',
+      '👑': '#FFD700',
+      '🔮': '#9C27B0',
+      '✨': '#00BCD4',
+      '🌟': '#FFC107'
     };
 
     let board = [];
-    let currentPiece = null;
-    let nextPiece = null;
     let score = 0;
-    let highScore = localStorage.getItem('tetrisHighScore') || 0;
-    let lines = 0;
-    let level = 1;
-    let gameState = 'initial';
-    let gameLoopTimeout = null;
-    let currentSpeed = 800;
-    let difficulty = 'medium';
+    let highScore = localStorage.getItem('match3HighScore') || 0;
+    let moves = 30;
+    let combo = 0;
+    let selectedCell = null;
+    let gameActive = true;
     let particles = [];
-    let baseSpeed = 800;
+    let gameHistory = [];
 
     document.getElementById('highScore').innerText = highScore;
 
-    class Piece {
-      constructor(type) {
-        this.type = type || Object.keys(TETROMINOS)[Math.floor(Math.random() * 7)];
-        this.shape = TETROMINOS[this.type];
-        this.x = Math.floor(COLS / 2) - 1;
-        this.y = 0;
-        this.rotation = 0;
-      }
-
-      getBlocks() {
-        return this.shape.map(([x, y]) => [this.x + x, this.y + y]);
-      }
-
-      canMove(dx, dy) {
-        return this.getBlocks().every(([x, y]) => {
-          const nx = x + dx;
-          const ny = y + dy;
-          return nx >= 0 && nx < COLS && ny < ROWS && !board[ny][nx];
-        });
-      }
-
-      move(dx, dy) {
-        if (this.canMove(dx, dy)) {
-          this.x += dx;
-          this.y += dy;
-          return true;
-        }
-        return false;
-      }
-
-      rotate() {
-        const oldShape = this.shape;
-        this.shape = this.shape.map(([x, y]) => [-y, x]);
-        
-        if (!this.getBlocks().every(([x, y]) => 
-          x >= 0 && x < COLS && y < ROWS)) {
-          this.shape = oldShape;
-          return false;
-        }
-        return true;
-      }
-    }
-
     function initBoard() {
-      board = Array(ROWS).fill().map(() => Array(COLS).fill(0));
-    }
-
-    function generatePiece() {
-      currentPiece = nextPiece || new Piece();
-      nextPiece = new Piece();
-      
-      if (!canPlacePiece(currentPiece)) {
-        endGame();
-      }
-    }
-
-    function canPlacePiece(piece) {
-      return piece.getBlocks().every(([x, y]) => {
-        return x >= 0 && x < COLS && y >= 0 && y < ROWS && !board[y][x];
-      });
-    }
-
-    function lockPiece() {
-      const blocks = currentPiece.getBlocks();
-      blocks.forEach(([x, y]) => {
-        if (y >= 0) {
-          board[y][x] = currentPiece.type;
-        }
-      });
-
-      const clearedLines = clearLines();
-      if (clearedLines > 0) {
-        playSound(800, 0.1);
-        createParticles(canvas.width / 2, canvas.height / 2, '#4caf50');
-      }
-
-      generatePiece();
-    }
-
-    function clearLines() {
-      let cleared = 0;
-      
-      for (let y = ROWS - 1; y >= 0; y--) {
-        if (board[y].every(cell => cell !== 0)) {
-          board.splice(y, 1);
-          board.unshift(Array(COLS).fill(0));
-          cleared++;
-          y++;
+      board = [];
+      for (let y = 0; y < ROWS; y++) {
+        board[y] = [];
+        for (let x = 0; x < COLS; x++) {
+          board[y][x] = GEMS[Math.floor(Math.random() * GEMS.length)];
         }
       }
-
-      if (cleared > 0) {
-        lines += cleared;
-        score += cleared * 100;
-        updateLevel();
-        document.getElementById('lines').innerText = lines;
-        document.getElementById('score').innerText = score;
-      }
-
-      return cleared;
-    }
-
-    function updateLevel() {
-      const newLevel = Math.floor(lines / 5) + 1;
-      if (newLevel !== level) {
-        level = newLevel;
-        document.getElementById('level').innerText = level;
-        updateSpeed();
+      
+      while (checkForMatches()) {
+        removeMatches();
+        dropGems();
       }
     }
 
-    function updateSpeed() {
-      currentSpeed = Math.max(100, baseSpeed - (level - 1) * 50);
+    function renderBoard() {
+      const gameBoard = document.getElementById('gameBoard');
+      gameBoard.innerHTML = '';
+
+      for (let y = 0; y < ROWS; y++) {
+        for (let x = 0; x < COLS; x++) {
+          const cell = document.createElement('button');
+          cell.className = 'game-cell';
+          cell.textContent = board[y][x];
+          
+          if (selectedCell && selectedCell.x === x && selectedCell.y === y) {
+            cell.classList.add('selected');
+          }
+
+          cell.onclick = () => selectCell(x, y);
+          gameBoard.appendChild(cell);
+        }
+      }
+    }
+
+    function selectCell(x, y) {
+      if (!gameActive) return;
+
+      if (!selectedCell) {
+        selectedCell = { x, y };
+        renderBoard();
+        return;
+      }
+
+      // Перевірка сусідності
+      const dist = Math.abs(selectedCell.x - x) + Math.abs(selectedCell.y - y);
+      if (dist !== 1) {
+        selectedCell = { x, y };
+        renderBoard();
+        return;
+      }
+
+      // Обміняємо камінці
+      saveHistory();
+      [board[selectedCell.y][selectedCell.x], board[y][x]] = 
+      [board[y][x], board[selectedCell.y][selectedCell.x]];
+      
+      selectedCell = null;
+      moves--;
+      document.getElementById('moves').innerText = moves;
+
+      // Перевіряємо збіги
+      if (checkForMatches()) {
+        processMatches();
+      } else {
+        // Якщо нема збігів - повертаємо назад
+        loadHistory();
+        moves++;
+        document.getElementById('moves').innerText = moves;
+      }
+
+      checkGameOver();
+    }
+
+    function checkForMatches() {
+      // Перевірка горизонталей
+      for (let y = 0; y < ROWS; y++) {
+        for (let x = 0; x < COLS - 2; x++) {
+          if (board[y][x] && 
+              board[y][x] === board[y][x + 1] && 
+              board[y][x] === board[y][x + 2]) {
+            return true;
+          }
+        }
+      }
+
+      // Перевірка вертикалей
+      for (let y = 0; y < ROWS - 2; y++) {
+        for (let x = 0; x < COLS; x++) {
+          if (board[y][x] && 
+              board[y][x] === board[y + 1][x] && 
+              board[y][x] === board[y + 2][x]) {
+            return true;
+          }
+        }
+      }
+
+      return false;
+    }
+
+    function removeMatches() {
+      let removed = [];
+
+      // Горизонтальні збіги
+      for (let y = 0; y < ROWS; y++) {
+        for (let x = 0; x < COLS - 2; x++) {
+          if (board[y][x] && 
+              board[y][x] === board[y][x + 1] && 
+              board[y][x] === board[y][x + 2]) {
+            
+            for (let i = 0; i < 3; i++) {
+              removed.push({x: x + i, y: y, gem: board[y][x + i]});
+              board[y][x + i] = null;
+            }
+          }
+        }
+      }
+
+      // Вертикальні збіги
+      for (let y = 0; y < ROWS - 2; y++) {
+        for (let x = 0; x < COLS; x++) {
+          if (board[y][x] && 
+              board[y][x] === board[y + 1][x] && 
+              board[y][x] === board[y + 2][x]) {
+            
+            for (let i = 0; i < 3; i++) {
+              const alreadyRemoved = removed.some(r => r.x === x && r.y === y + i);
+              if (!alreadyRemoved) {
+                removed.push({x: x, y: y + i, gem: board[y + i][x]});
+                board[y + i][x] = null;
+              }
+            }
+          }
+        }
+      }
+
+      // Частинки для видалених камінців
+      removed.forEach(r => {
+        const cellX = r.x * 65 + 40;
+        const cellY = r.y * 65 + 150;
+        createParticles(cellX, cellY, COLORS[r.gem]);
+      });
+
+      score += removed.length * 10;
+      playSound(800, 0.1);
+    }
+
+    function dropGems() {
+      for (let x = 0; x < COLS; x++) {
+        for (let y = ROWS - 1; y >= 0; y--) {
+          if (!board[y][x]) {
+            let above = y - 1;
+            while (above >= 0 && !board[above][x]) {
+              above--;
+            }
+
+            if (above >= 0) {
+              board[y][x] = board[above][x];
+              board[above][x] = null;
+            } else {
+              board[y][x] = GEMS[Math.floor(Math.random() * GEMS.length)];
+            }
+          }
+        }
+      }
+    }
+
+    function processMatches() {
+      removeMatches();
+      dropGems();
+      combo++;
+      document.getElementById('combo').innerText = combo + 'x';
+
+      if (checkForMatches()) {
+        setTimeout(() => processMatches(), 300);
+      } else {
+        combo = 0;
+        document.getElementById('combo').innerText = '0x';
+      }
+
+      document.getElementById('score').innerText = score;
+      renderBoard();
     }
 
     function playSound(freq, duration) {
@@ -688,230 +629,70 @@
       particleCtx.globalAlpha = 1;
     }
 
-    function draw() {
-      ctx.fillStyle = "#0e1621";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    function saveHistory() {
+      gameHistory = JSON.parse(JSON.stringify(board));
+    }
 
-      // Draw board
-      for (let y = 0; y < ROWS; y++) {
-        for (let x = 0; x < COLS; x++) {
-          const cell = board[y][x];
-          if (cell) {
-            ctx.fillStyle = COLORS[cell];
-            ctx.shadowColor = `${COLORS[cell]}80`;
-            ctx.shadowBlur = 8;
-            ctx.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE - 1, BLOCK_SIZE - 1);
-            ctx.shadowBlur = 0;
+    function loadHistory() {
+      board = JSON.parse(JSON.stringify(gameHistory));
+      renderBoard();
+    }
+
+    function undoMove() {
+      if (gameHistory.length > 0) {
+        loadHistory();
+      }
+    }
+
+    function checkGameOver() {
+      if (moves <= 0) {
+        gameActive = false;
+        setTimeout(() => {
+          const isNewRecord = score > highScore;
+          if (isNewRecord) {
+            highScore = score;
+            localStorage.setItem('match3HighScore', highScore);
+            playSound(1200, 0.3);
           }
-        }
-      }
 
-      // Draw current piece
-      if (currentPiece) {
-        const blocks = currentPiece.getBlocks();
-        ctx.fillStyle = COLORS[currentPiece.type];
-        ctx.shadowColor = `${COLORS[currentPiece.type]}80`;
-        ctx.shadowBlur = 8;
-        
-        blocks.forEach(([x, y]) => {
-          if (y >= 0) {
-            ctx.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE - 1, BLOCK_SIZE - 1);
-          }
-        });
-        ctx.shadowBlur = 0;
-      }
-
-      // Draw grid
-      ctx.strokeStyle = 'rgba(76, 175, 80, 0.1)';
-      ctx.lineWidth = 0.5;
-      for (let i = 0; i <= COLS; i++) {
-        ctx.beginPath();
-        ctx.moveTo(i * BLOCK_SIZE, 0);
-        ctx.lineTo(i * BLOCK_SIZE, canvas.height);
-        ctx.stroke();
-      }
-      for (let i = 0; i <= ROWS; i++) {
-        ctx.beginPath();
-        ctx.moveTo(0, i * BLOCK_SIZE);
-        ctx.lineTo(canvas.width, i * BLOCK_SIZE);
-        ctx.stroke();
+          document.getElementById('finalScore').innerText = score;
+          document.getElementById('finalHighScore').innerText = highScore;
+          document.getElementById('finalMoves').innerText = moves;
+          document.getElementById('newRecordRow').style.display = isNewRecord ? 'flex' : 'none';
+          document.getElementById('gameOverModal').classList.add('active');
+        }, 300);
       }
     }
 
-    function drawNextPiece() {
-      nextCtx.fillStyle = "#0e1621";
-      nextCtx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
-
-      if (nextPiece) {
-        const blocks = nextPiece.shape;
-        const blockSize = nextCanvas.width / 6;
-        nextCtx.fillStyle = COLORS[nextPiece.type];
-        nextCtx.shadowColor = `${COLORS[nextPiece.type]}80`;
-        nextCtx.shadowBlur = 4;
-        
-        const offsetX = (nextCanvas.width - blockSize * 4) / 2;
-        const offsetY = (nextCanvas.height - blockSize * 4) / 2;
-        
-        blocks.forEach(([x, y]) => {
-          nextCtx.fillRect(
-            offsetX + x * blockSize, 
-            offsetY + y * blockSize, 
-            blockSize - 1, 
-            blockSize - 1
-          );
-        });
-        nextCtx.shadowBlur = 0;
-      }
-    }
-
-    function movePiece(dir) {
-      if (gameState !== 'playing' || !currentPiece) return;
-      
-      if (dir === 'LEFT') currentPiece.move(-1, 0);
-      if (dir === 'RIGHT') currentPiece.move(1, 0);
-      if (dir === 'DOWN') {
-        if (!currentPiece.move(0, 1)) {
-          lockPiece();
-        } else {
-          score += 1;
-          document.getElementById('score').innerText = score;
-        }
-      }
-    }
-
-    function rotatePiece() {
-      if (gameState !== 'playing' || !currentPiece) return;
-      currentPiece.rotate();
-      playSound(400, 0.05);
-    }
-
-    function showDifficultyModal() {
+    function startNewGame() {
       document.getElementById('gameOverModal').classList.remove('active');
-      document.getElementById('difficultyModal').classList.add('active');
-      gameState = 'initial';
-    }
-
-    function startGame(difficultyLevel) {
-      difficulty = difficultyLevel;
-      
-      if (difficultyLevel === 'easy') {
-        currentSpeed = 1000;
-        baseSpeed = 1000;
-      } else if (difficultyLevel === 'medium') {
-        currentSpeed = 800;
-        baseSpeed = 800;
-      } else if (difficultyLevel === 'hard') {
-        currentSpeed = 500;
-        baseSpeed = 500;
-      }
-      
-      document.getElementById('difficultyModal').classList.remove('active');
-      resetGame();
-    }
-
-    function togglePause() {
-      if (gameState === 'gameOver' || gameState === 'initial') return;
-      if (gameState === 'playing') {
-        gameState = 'paused';
-        clearTimeout(gameLoopTimeout);
-        document.getElementById('pauseBtn').textContent = '▶️ ПРОДОВЖИТИ';
-      } else if (gameState === 'paused') {
-        gameState = 'playing';
-        document.getElementById('pauseBtn').textContent = '⏸️ ПАУЗА';
-        loop();
-      }
-    }
-
-    function resetGame() {
       score = 0;
-      lines = 0;
-      level = 1;
-      gameState = 'playing';
-      initBoard();
-      generatePiece();
+      moves = 30;
+      combo = 0;
+      selectedCell = null;
+      gameActive = true;
+      gameHistory = [];
       document.getElementById('score').innerText = score;
-      document.getElementById('lines').innerText = lines;
-      document.getElementById('level').innerText = level;
-      document.getElementById('pauseBtn').textContent = '⏸️ ПАУЗА';
-      loop();
-    }
-
-    function loop() {
-      if (gameState === 'playing') {
-        if (!currentPiece.move(0, 1)) {
-          lockPiece();
-        }
-      }
-      
-      draw();
-      drawNextPiece();
-      updateParticles();
-      
-      if (gameState !== 'paused' && gameState !== 'initial') {
-        gameLoopTimeout = setTimeout(loop, currentSpeed);
-      } else if (gameState !== 'initial') {
-        gameLoopTimeout = setTimeout(loop, 16);
-      }
-    }
-
-    function endGame() {
-      clearTimeout(gameLoopTimeout);
-      gameState = 'gameOver';
-      const isNewRecord = score > highScore;
-      
-      if (isNewRecord) {
-        highScore = score;
-        localStorage.setItem('tetrisHighScore', highScore);
-        playSound(1200, 0.3);
-      } else {
-        playSound(300, 0.3);
-      }
-      
-      document.getElementById('finalScore').innerText = score;
-      document.getElementById('finalHighScore').innerText = highScore;
-      document.getElementById('finalLines').innerText = lines;
-      document.getElementById('finalLevel').innerText = level;
-      document.getElementById('newRecordRow').style.display = isNewRecord ? 'flex' : 'none';
-      document.getElementById('gameOverModal').classList.add('active');
+      document.getElementById('moves').innerText = moves;
+      document.getElementById('combo').innerText = '0x';
+      initBoard();
+      renderBoard();
     }
 
     // Keyboard controls
     document.addEventListener("keydown", (e) => {
-      if (e.key === "ArrowLeft") movePiece('LEFT');
-      if (e.key === "ArrowRight") movePiece('RIGHT');
-      if (e.key === "ArrowDown") movePiece('DOWN');
-      if (e.key === "ArrowUp") rotatePiece();
-      if (e.key === " ") togglePause();
-    });
-
-    // Touch controls
-    let touchStartX = 0, touchStartY = 0;
-    canvas.addEventListener('touchstart', (e) => {
-      const touch = e.touches[0];
-      touchStartX = touch.clientX;
-      touchStartY = touch.clientY;
-    });
-
-    canvas.addEventListener('touchend', (e) => {
-      if (!e.changedTouches.length) return;
-      const touch = e.changedTouches[0];
-      const diffX = touch.clientX - touchStartX;
-      const diffY = touch.clientY - touchStartY;
-      const threshold = 30;
-
-      if (Math.abs(diffX) > Math.abs(diffY)) {
-        if (diffX > threshold) movePiece('RIGHT');
-        else if (diffX < -threshold) movePiece('LEFT');
-      } else {
-        if (diffY > threshold) movePiece('DOWN');
-        else if (diffY < -threshold) rotatePiece();
+      if (e.key === "z" && e.ctrlKey) {
+        undoMove();
       }
     });
 
-    // Start
+    // Start game
     document.addEventListener('DOMContentLoaded', () => {
-      showDifficultyModal();
+      startNewGame();
     });
+
+    // Animation loop
+    setInterval(updateParticles, 16);
   </script>
 </body>
 </html>
