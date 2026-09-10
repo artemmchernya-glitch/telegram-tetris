@@ -1,183 +1,183 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Змійка WebApp</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none;
-        }
-        body {
-            background-color: var(--tg-theme-bg-color, #181818);
-            color: var(--tg-theme-text-color, #ffffff);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            overflow: hidden;
-        }
-        #score-board {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        canvas {
-            border: 2px solid var(--tg-theme-button-color, #242f3d);
-            background-color: #000000;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
-        .controls {
-            display: grid;
-            grid-template-columns: repeat(3, 60px);
-            grid-template-rows: repeat(2, 60px);
-            gap: 10px;
-            margin-top: 15px;
-        }
-        .btn {
-            background-color: var(--tg-theme-button-color, #2f6ea5);
-            color: var(--tg-theme-button-text-color, #ffffff);
-            border: none;
-            border-radius: 12px;
-            font-size: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            touch-action: manipulation;
-        }
-        .btn:active {
-            opacity: 0.7;
-        }
-        .btn-up { grid-column: 2; grid-row: 1; }
-        .btn-left { grid-column: 1; grid-row: 2; }
-        .btn-down { grid-column: 2; grid-row: 2; }
-        .btn-right { grid-column: 3; grid-row: 2; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Змійка</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    * { box-sizing: border-box; touch-action: manipulation; }
+    body {
+      margin: 0;
+      background: #17212b;
+      color: #fff;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    #score-board {
+      font-size: 20px;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    canvas {
+      background: #0e1621;
+      border: 2px solid #5288c1;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(3, 70px);
+      grid-template-rows: repeat(2, 60px);
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .btn {
+      background: #2b5278;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .btn:active { background: #5288c1; }
+    .btn-up { grid-column: 2; grid-row: 1; }
+    .btn-left { grid-column: 1; grid-row: 2; }
+    .btn-down { grid-column: 2; grid-row: 2; }
+    .btn-right { grid-column: 3; grid-row: 2; }
+  </style>
 </head>
 <body>
 
-    <div id="score-board">Рахунок: <span id="score">0</span></div>
-    <canvas id="gameCanvas" width="300" height="300"></canvas>
+  <div id="score-board">Рахунок: <span id="score">0</span></div>
+  <canvas id="game" width="320" height="320"></canvas>
 
-    <div class="controls">
-        <button class="btn btn-up" onclick="setDirection('UP')">⬆️</button>
-        <button class="btn btn-left" onclick="setDirection('LEFT')">⬅️</button>
-        <button class="btn btn-down" onclick="setDirection('DOWN')">⬇️</button>
-        <button class="btn btn-right" onclick="setDirection('RIGHT')">➡️</button>
-    </div>
+  <!-- Кнопки керування для смартфона -->
+  <div class="controls">
+    <button class="btn btn-up" onclick="setDir('UP')">⬆️</button>
+    <button class="btn btn-left" onclick="setDir('LEFT')">⬅️</button>
+    <button class="btn btn-down" onclick="setDir('DOWN')">⬇️</button>
+    <button class="btn btn-right" onclick="setDir('RIGHT')">➡️</button>
+  </div>
 
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+  <script>
+    const tg = window.Telegram?.WebApp;
+    if (tg) tg.ready();
 
-        const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
-        const scoreElement = document.getElementById("score");
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+    const grid = 16;
+    const count = canvas.width / grid;
 
-        const grid = 15;
-        let count = 0;
-        let score = 0;
+    let score = 0;
+    let snake = [{x: 10, y: 10}];
+    let food = {x: 5, y: 5};
+    let dx = 1, dy = 0;
+    let nextDx = 1, nextDy = 0;
+    
+    // Налаштування швидкості (у мілісекундах)
+    let baseSpeed = 160; // Початкова комфортна швидкість
+    let currentSpeed = baseSpeed;
+    let minSpeed = 60;   // Максимальне прискорення
+    let gameLoopTimeout = null;
 
-        let snake = {
-            x: 150,
-            y: 150,
-            dx: grid,
-            dy: 0,
-            cells: [],
-            maxCells: 4
-        };
+    function generateFood() {
+      food.x = Math.floor(Math.random() * count);
+      food.y = Math.floor(Math.random() * count);
+    }
 
-        let apple = { x: 60, y: 60 };
+    function setDir(dir) {
+      if (dir === 'UP' && dy === 0) { nextDx = 0; nextDy = -1; }
+      if (dir === 'DOWN' && dy === 0) { nextDx = 0; nextDy = 1; }
+      if (dir === 'LEFT' && dx === 0) { nextDx = -1; nextDy = 0; }
+      if (dir === 'RIGHT' && dx === 0) { nextDx = 1; nextDy = 0; }
+    }
 
-        function getRandomInt(min, max) {
-            return Math.floor(Math.random() * (max - min)) + min;
+    // Зчитування клавіш на ПК
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowUp") setDir('UP');
+      if (e.key === "ArrowDown") setDir('DOWN');
+      if (e.key === "ArrowLeft") setDir('LEFT');
+      if (e.key === "ArrowRight") setDir('RIGHT');
+    });
+
+    function resetGame() {
+      alert(`Гра закінчена! Ваш рахунок: ${score}`);
+      score = 0;
+      document.getElementById("score").innerText = score;
+      snake = [{x: 10, y: 10}];
+      dx = 1; dy = 0;
+      nextDx = 1; nextDy = 0;
+      currentSpeed = baseSpeed; // Скидаємо швидкість до початкової
+      generateFood();
+    }
+
+    function update() {
+      dx = nextDx;
+      dy = nextDy;
+
+      const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+
+      // Перевірка зіткнення зі стінами або собою
+      if (
+        head.x < 0 || head.x >= count || 
+        head.y < 0 || head.y >= count ||
+        snake.some(segment => segment.x === head.x && segment.y === head.y)
+      ) {
+        resetGame();
+        return;
+      }
+
+      snake.unshift(head);
+
+      // Перевірка поїдання їжі
+      if (head.x === food.x && head.y === food.y) {
+        score += 1;
+        document.getElementById("score").innerText = score;
+        generateFood();
+
+        // Поступове прискорення: кожні 2 ягоди швидкість збільшується на 5 мс
+        if (currentSpeed > minSpeed) {
+          currentSpeed -= 5;
         }
+      } else {
+        snake.pop();
+      }
+    }
 
-        function resetGame() {
-            snake.x = 150;
-            snake.y = 150;
-            snake.cells = [];
-            snake.maxCells = 4;
-            snake.dx = grid;
-            snake.dy = 0;
-            score = 0;
-            scoreElement.innerText = score;
-            apple.x = getRandomInt(0, 20) * grid;
-            apple.y = getRandomInt(0, 20) * grid;
-        }
+    function draw() {
+      ctx.fillStyle = "#0e1621";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        function setDirection(dir) {
-            if (dir === 'LEFT' && snake.dx === 0) { snake.dx = -grid; snake.dy = 0; }
-            else if (dir === 'UP' && snake.dy === 0) { snake.dy = -grid; snake.dx = 0; }
-            else if (dir === 'RIGHT' && snake.dx === 0) { snake.dx = grid; snake.dy = 0; }
-            else if (dir === 'DOWN' && snake.dy === 0) { snake.dy = grid; snake.dx = 0; }
-        }
+      // Малюємо їжу
+      ctx.fillStyle = "#e53935";
+      ctx.fillRect(food.x * grid, food.y * grid, grid - 1, grid - 1);
 
-        document.addEventListener('keydown', function(e) {
-            if (e.key === "ArrowLeft") setDirection('LEFT');
-            if (e.key === "ArrowUp") setDirection('UP');
-            if (e.key === "ArrowRight") setDirection('RIGHT');
-            if (e.key === "ArrowDown") setDirection('DOWN');
-        });
+      // Малюємо змійку
+      ctx.fillStyle = "#4caf50";
+      snake.forEach((segment, index) => {
+        if (index === 0) ctx.fillStyle = "#81c784"; // Голова світліша
+        else ctx.fillStyle = "#4caf50";
+        ctx.fillRect(segment.x * grid, segment.y * grid, grid - 1, grid - 1);
+      });
+    }
 
-        function loop() {
-            requestAnimationFrame(loop);
+    function loop() {
+      update();
+      draw();
+      // Запускаємо наступний кадр з актуальною затримкою
+      gameLoopTimeout = setTimeout(loop, currentSpeed);
+    }
 
-            if (++count < 6) return; // Швидкість гри
-            count = 0;
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            snake.x += snake.dx;
-            snake.y += snake.dy;
-
-            // Зіткнення зі стінами
-            if (snake.x < 0 || snake.x >= canvas.width || snake.y < 0 || snake.y >= canvas.height) {
-                resetGame();
-            }
-
-            snake.cells.unshift({x: snake.x, y: snake.y});
-
-            if (snake.cells.length > snake.maxCells) {
-                snake.cells.pop();
-            }
-
-            // Малювання яблука
-            ctx.fillStyle = '#ff4d4d';
-            ctx.fillRect(apple.x, apple.y, grid - 1, grid - 1);
-
-            // Малювання змійки
-            ctx.fillStyle = '#4CAF50';
-            snake.cells.forEach(function(cell, index) {
-                ctx.fillRect(cell.x, cell.y, grid - 1, grid - 1);
-
-                // Поїдання яблука
-                if (cell.x === apple.x && cell.y === apple.y) {
-                    snake.maxCells++;
-                    score += 10;
-                    scoreElement.innerText = score;
-                    apple.x = getRandomInt(0, 20) * grid;
-                    apple.y = getRandomInt(0, 20) * grid;
-                }
-
-                // Перевірка зіткнення з собою
-                for (let i = index + 1; i < snake.cells.length; i++) {
-                    if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
-                        resetGame();
-                    }
-                }
-            });
-        }
-
-        requestAnimationFrame(loop);
-    </script>
+    // Запуск гри
+    loop();
+  </script>
 </body>
 </html>
