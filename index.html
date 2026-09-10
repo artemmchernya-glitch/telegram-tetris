@@ -25,45 +25,48 @@
     }
 
     h2 {
-      margin: 10px 0 15px 0;
-      font-size: 28px;
+      margin: 8px 0 10px 0;
+      font-size: 26px;
       text-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
     }
 
     .stats-container {
       display: flex;
-      gap: 20px;
-      margin-bottom: 15px;
+      gap: 10px;
+      margin-bottom: 10px;
       width: 100%;
       justify-content: center;
+      flex-wrap: wrap;
     }
 
     .stat-box {
       text-align: center;
-      padding: 10px 15px;
+      padding: 8px 12px;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(76, 175, 80, 0.3);
       border-radius: 8px;
-      min-width: 100px;
+      min-width: 80px;
     }
 
     .stat-label {
-      font-size: 12px;
+      font-size: 10px;
       color: #888;
       text-transform: uppercase;
-      margin-bottom: 5px;
+      margin-bottom: 4px;
     }
 
     .stat-value {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: bold;
       color: #4CAF50;
     }
 
     .game-container {
       display: flex;
-      gap: 20px;
+      gap: 15px;
       align-items: flex-start;
+      width: 100%;
+      justify-content: center;
     }
 
     #tetris {
@@ -72,51 +75,54 @@
       border-radius: 8px;
       box-shadow: 0 0 25px rgba(76, 175, 80, 0.3);
       image-rendering: pixelated;
+      width: auto;
+      height: auto;
+      max-width: 100%;
     }
 
     .next-container {
       display: flex;
       flex-direction: column;
-      gap: 20px;
-      width: 150px;
+      gap: 10px;
+      min-width: 80px;
     }
 
     .next-box {
       background: rgba(255, 255, 255, 0.05);
       border: 2px solid rgba(76, 175, 80, 0.3);
       border-radius: 8px;
-      padding: 10px;
+      padding: 8px;
       text-align: center;
     }
 
     .next-label {
-      font-size: 12px;
+      font-size: 10px;
       color: #888;
       text-transform: uppercase;
-      margin-bottom: 8px;
+      margin-bottom: 5px;
     }
 
     #nextCanvas {
       border: 1px solid #444;
       background: #000;
       border-radius: 4px;
-      width: 100%;
-      aspect-ratio: 1;
+      width: 80px;
+      height: 80px;
     }
 
     .controls {
       display: grid;
-      grid-template-columns: repeat(3, 70px);
-      grid-gap: 12px;
-      margin-top: 20px;
+      grid-template-columns: repeat(3, 60px);
+      grid-gap: 8px;
+      margin-top: 15px;
     }
 
     .btn {
-      width: 70px;
-      height: 70px;
+      width: 60px;
+      height: 60px;
       background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
       color: #fff;
-      font-size: 24px;
+      font-size: 22px;
       border: 2px solid #4CAF50;
       border-radius: 12px;
       display: flex;
@@ -277,33 +283,82 @@
     }
 
     @media (max-width: 600px) {
+      body {
+        padding: 5px;
+      }
+
+      h2 {
+        margin: 5px 0 8px 0;
+        font-size: 22px;
+      }
+
+      .stats-container {
+        gap: 6px;
+        margin-bottom: 8px;
+      }
+
+      .stat-box {
+        padding: 6px 10px;
+        min-width: 70px;
+      }
+
+      .stat-label {
+        font-size: 9px;
+        margin-bottom: 2px;
+      }
+
+      .stat-value {
+        font-size: 15px;
+      }
+
       .game-container {
-        flex-direction: column;
-        gap: 15px;
-      }
-
-      .next-container {
-        width: 100%;
-        flex-direction: row;
-      }
-
-      .next-box {
-        flex: 1;
-      }
-
-      .controls {
-        grid-template-columns: repeat(3, 60px);
-        grid-gap: 10px;
-      }
-
-      .btn {
-        width: 60px;
-        height: 60px;
-        font-size: 20px;
+        gap: 10px;
+        margin-bottom: 10px;
       }
 
       #tetris {
-        max-width: 100%;
+        max-width: 80vw;
+        height: auto;
+      }
+
+      .next-container {
+        min-width: 70px;
+      }
+
+      .next-box {
+        padding: 6px;
+      }
+
+      .next-label {
+        font-size: 8px;
+        margin-bottom: 4px;
+      }
+
+      #nextCanvas {
+        width: 70px;
+        height: 70px;
+      }
+
+      .controls {
+        grid-template-columns: repeat(3, 50px);
+        grid-gap: 6px;
+        margin-top: 10px;
+      }
+
+      .btn {
+        width: 50px;
+        height: 50px;
+        font-size: 18px;
+      }
+
+      .status-buttons {
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .status-btn {
+        padding: 10px 16px;
+        font-size: 13px;
       }
     }
   </style>
@@ -328,7 +383,7 @@
 
   <div class="game-container">
     <div>
-      <canvas id="tetris" width="240" height="400"></canvas>
+      <canvas id="tetris" width="200" height="320"></canvas>
       <div class="controls">
         <div></div>
         <button class="btn" onclick="rotate()" id="rotateBtn">🔄</button>
@@ -342,7 +397,7 @@
     <div class="next-container">
       <div class="next-box">
         <div class="next-label">Далі</div>
-        <canvas id="nextCanvas" width="100" height="100"></canvas>
+        <canvas id="nextCanvas" width="80" height="80"></canvas>
       </div>
     </div>
   </div>
@@ -355,7 +410,7 @@
   <!-- Game Over Modal -->
   <div class="modal" id="gameOverModal">
     <div class="modal-content">
-      <h1>ГЕРА ЗАКІНЧЕНА</h1>
+      <h1>ГРА ЗАКІНЧЕНА</h1>
       <div class="modal-stats">
         <div class="modal-stat-row">
           <span class="modal-stat-label">Фінальний рахунок:</span>
@@ -388,11 +443,13 @@
 
     const canvas = document.getElementById('tetris');
     const context = canvas.getContext('2d');
-    context.scale(20, 20);
+    const scale = canvas.width / 12; // Адаптивний масштаб
+    context.scale(scale, scale);
 
     const nextCanvas = document.getElementById('nextCanvas');
     const nextContext = nextCanvas.getContext('2d');
-    nextContext.scale(10, 10);
+    const nextScale = nextCanvas.width / 8;
+    nextContext.scale(nextScale, nextScale);
 
     let score = 0;
     let highScore = localStorage.getItem('tetrisHighScore') || 0;
