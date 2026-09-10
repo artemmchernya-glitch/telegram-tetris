@@ -3,100 +3,148 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Змійка</title>
+  <title>Тетріс WebApp</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    * { 
-      box-sizing: border-box; 
-      touch-action: manipulation;
+    * {
+      box-sizing: border-box;
     }
 
     body {
-      margin: 0;
-      background: linear-gradient(135deg, #17212b 0%, #0a0e1b 100%);
+      background: linear-gradient(135deg, #181818 0%, #0a0a0a 100%);
       color: #fff;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
+      margin: 0;
+      padding: 4px;
+      touch-action: manipulation;
       min-height: 100vh;
-      padding: 10px;
+      width: 100%;
+      overflow: hidden;
     }
 
-    h1 {
-      font-size: 32px;
-      margin: 15px 0;
-      text-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+    h2 {
+      margin: 3px 0 5px 0;
+      font-size: 18px;
+      text-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
     }
 
     .stats-container {
-      display: flex;
-      gap: 15px;
-      margin-bottom: 15px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
       width: 100%;
-      justify-content: center;
-      flex-wrap: wrap;
+      max-width: 280px;
+      margin-bottom: 4px;
+      padding: 0 2px;
     }
 
     .stat-box {
       text-align: center;
-      padding: 10px 15px;
+      padding: 3px 4px;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(76, 175, 80, 0.3);
-      border-radius: 8px;
-      min-width: 90px;
+      border-radius: 4px;
     }
 
     .stat-label {
-      font-size: 11px;
+      font-size: 7px;
       color: #888;
       text-transform: uppercase;
-      margin-bottom: 4px;
+      margin-bottom: 1px;
+      line-height: 1.1;
     }
 
     .stat-value {
-      font-size: 18px;
+      font-size: 13px;
       font-weight: bold;
-      color: #4caf50;
+      color: #4CAF50;
+      line-height: 1;
     }
 
-    #canvas {
-      background: #0e1621;
-      border: 3px solid #4caf50;
-      border-radius: 8px;
-      box-shadow: 0 0 25px rgba(76, 175, 80, 0.3);
+    .game-container {
+      display: flex;
+      gap: 6px;
+      align-items: flex-start;
+      justify-content: center;
+      margin-top: 2px;
+      width: 100%;
+    }
+
+    #tetris {
+      border: 2px solid #4CAF50;
+      background: #000;
+      border-radius: 3px;
+      box-shadow: 0 0 12px rgba(76, 175, 80, 0.3);
       image-rendering: pixelated;
-      max-width: 100%;
+      width: 140px;
+      height: 240px;
+      flex-shrink: 0;
+    }
+
+    .next-container {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      width: 55px;
+      flex-shrink: 0;
+    }
+
+    .next-box {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(76, 175, 80, 0.3);
+      border-radius: 3px;
+      padding: 3px;
+      text-align: center;
+    }
+
+    .next-label {
+      font-size: 7px;
+      color: #888;
+      text-transform: uppercase;
+      margin-bottom: 1px;
+    }
+
+    #nextCanvas {
+      border: 1px solid #333;
+      background: #000;
+      border-radius: 2px;
+      width: 100%;
+      aspect-ratio: 1;
     }
 
     .controls {
       display: grid;
-      grid-template-columns: repeat(3, 70px);
-      grid-template-rows: repeat(2, 60px);
-      gap: 10px;
-      margin-top: 20px;
+      grid-template-columns: repeat(3, 42px);
+      grid-gap: 4px;
+      margin-top: 6px;
     }
 
     .btn {
-      background: linear-gradient(135deg, #2b5278 0%, #1a3a52 100%);
-      border: 2px solid #4caf50;
-      border-radius: 8px;
-      color: white;
-      font-size: 24px;
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+      color: #fff;
+      font-size: 16px;
+      border: 2px solid #4CAF50;
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
+      user-select: none;
       cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
       transition: all 0.2s ease;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     }
 
     .btn:active {
-      background: #4caf50;
+      background: #4CAF50;
       color: #000;
-      transform: scale(0.92);
-      box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+      transform: scale(0.9);
+      box-shadow: 0 0 12px rgba(76, 175, 80, 0.5);
     }
 
     .btn:disabled {
@@ -104,46 +152,37 @@
       cursor: not-allowed;
     }
 
-    .btn-up { grid-column: 2; grid-row: 1; }
-    .btn-left { grid-column: 1; grid-row: 2; }
-    .btn-down { grid-column: 2; grid-row: 2; }
-    .btn-right { grid-column: 3; grid-row: 2; }
-
     .status-buttons {
       display: flex;
-      gap: 10px;
-      margin-top: 20px;
+      gap: 4px;
+      margin-top: 6px;
+      width: 100%;
+      padding: 0 2px;
+      justify-content: center;
     }
 
     .status-btn {
-      padding: 12px 24px;
-      background: #4caf50;
+      padding: 6px 12px;
+      background: #4CAF50;
       color: #000;
       border: none;
-      border-radius: 8px;
-      font-size: 16px;
+      border-radius: 6px;
+      font-size: 12px;
       font-weight: bold;
       cursor: pointer;
       transition: all 0.2s ease;
-      box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+      box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);
+      flex: 1;
     }
 
     .status-btn:active {
       transform: scale(0.95);
     }
 
-    .status-btn:hover {
-      background: #5CBF60;
-    }
-
     .status-btn.secondary {
       background: rgba(255, 255, 255, 0.1);
       color: #fff;
-      border: 1px solid #4caf50;
-    }
-
-    .status-btn.secondary:hover {
-      background: rgba(76, 175, 80, 0.2);
+      border: 1px solid #4CAF50;
     }
 
     /* Modal Styles */
@@ -165,19 +204,21 @@
     }
 
     .modal-content {
-      background: linear-gradient(135deg, #1a2332 0%, #0a0e1b 100%);
-      border: 2px solid #4caf50;
-      border-radius: 16px;
-      padding: 40px 30px;
+      background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+      border: 2px solid #4CAF50;
+      border-radius: 12px;
+      padding: 24px 16px;
       text-align: center;
-      box-shadow: 0 0 50px rgba(76, 175, 80, 0.4);
+      box-shadow: 0 0 40px rgba(76, 175, 80, 0.4);
       animation: slideUp 0.3s ease;
       max-width: 90%;
+      max-height: 85vh;
+      overflow-y: auto;
     }
 
     @keyframes slideUp {
       from {
-        transform: translateY(50px);
+        transform: translateY(30px);
         opacity: 0;
       }
       to {
@@ -187,23 +228,23 @@
     }
 
     .modal h1 {
-      font-size: 42px;
-      color: #e53935;
-      margin: 0 0 20px 0;
-      text-shadow: 0 0 20px rgba(229, 57, 53, 0.5);
+      font-size: 32px;
+      color: #FF0D72;
+      margin: 0 0 16px 0;
+      text-shadow: 0 0 15px rgba(255, 13, 114, 0.5);
     }
 
     .modal-stats {
-      margin: 30px 0;
+      margin: 16px 0;
       text-align: left;
     }
 
     .modal-stat-row {
       display: flex;
       justify-content: space-between;
-      padding: 12px;
+      padding: 8px;
       border-bottom: 1px solid rgba(76, 175, 80, 0.2);
-      font-size: 16px;
+      font-size: 14px;
     }
 
     .modal-stat-row:last-child {
@@ -216,44 +257,40 @@
 
     .modal-stat-value {
       font-weight: bold;
-      color: #4caf50;
+      color: #4CAF50;
     }
 
     .modal-buttons {
       display: flex;
-      gap: 12px;
-      margin-top: 30px;
+      gap: 8px;
+      margin-top: 16px;
       justify-content: center;
       flex-wrap: wrap;
     }
 
     .modal-btn {
-      padding: 14px 28px;
-      font-size: 16px;
+      padding: 10px 20px;
+      font-size: 14px;
       font-weight: bold;
       border: none;
-      border-radius: 8px;
+      border-radius: 6px;
       cursor: pointer;
       transition: all 0.2s ease;
     }
 
     .modal-btn.restart {
-      background: #4caf50;
+      background: #4CAF50;
       color: #000;
       flex: 1;
-      min-width: 150px;
-    }
-
-    .modal-btn.restart:active {
-      transform: scale(0.95);
+      min-width: 120px;
     }
 
     .modal-btn.menu {
       background: rgba(255, 255, 255, 0.1);
       color: #fff;
-      border: 1px solid #4caf50;
+      border: 1px solid #4CAF50;
       flex: 1;
-      min-width: 150px;
+      min-width: 120px;
     }
 
     /* Difficulty Selection Modal */
@@ -264,67 +301,80 @@
     .difficulty-content {
       display: flex;
       flex-direction: column;
-      gap: 15px;
+      gap: 10px;
     }
 
     .difficulty-btn {
-      padding: 20px;
+      padding: 14px;
       background: rgba(76, 175, 80, 0.1);
-      border: 2px solid #4caf50;
-      border-radius: 8px;
-      color: #4caf50;
-      font-size: 18px;
+      border: 2px solid #4CAF50;
+      border-radius: 6px;
+      color: #4CAF50;
+      font-size: 14px;
       font-weight: bold;
       cursor: pointer;
       transition: all 0.3s ease;
     }
 
     .difficulty-btn:active {
-      background: #4caf50;
+      background: #4CAF50;
       color: #000;
       transform: scale(0.95);
     }
 
-    /* Particle effect */
-    canvas#particleCanvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      pointer-events: none;
-      z-index: 500;
-    }
+    @media (max-width: 400px) {
+      body {
+        padding: 3px;
+      }
 
-    @media (max-width: 500px) {
-      h1 {
-        font-size: 24px;
+      h2 {
+        font-size: 16px;
+        margin: 2px 0 3px 0;
+      }
+
+      .stats-container {
+        gap: 3px;
+      }
+
+      .stat-box {
+        padding: 2px 3px;
+      }
+
+      #tetris {
+        width: 130px;
+        height: 220px;
+      }
+
+      .next-container {
+        width: 50px;
       }
 
       .controls {
-        grid-template-columns: repeat(3, 60px);
-        grid-template-rows: repeat(2, 50px);
+        grid-template-columns: repeat(3, 38px);
+        grid-gap: 3px;
+        margin-top: 5px;
       }
 
       .btn {
-        font-size: 20px;
+        width: 38px;
+        height: 38px;
+        font-size: 14px;
       }
 
-      #canvas {
-        width: 100%;
-        height: auto;
+      .status-buttons {
+        gap: 3px;
+        margin-top: 5px;
       }
 
-      .modal-content {
-        padding: 25px 20px;
-      }
-
-      .modal h1 {
-        font-size: 32px;
+      .status-btn {
+        padding: 5px 8px;
+        font-size: 11px;
       }
     }
   </style>
 </head>
 <body>
-  <h1>🐍 ЗМІЙКА</h1>
+  <h2>🎮 ТЕТРІС</h2>
 
   <div class="stats-container">
     <div class="stat-box">
@@ -336,28 +386,39 @@
       <div class="stat-value" id="highScore">0</div>
     </div>
     <div class="stat-box">
-      <div class="stat-label">Довжина</div>
-      <div class="stat-value" id="length">1</div>
-    </div>
-    <div class="stat-box">
       <div class="stat-label">Рівень</div>
       <div class="stat-value" id="level">1</div>
     </div>
+    <div class="stat-box">
+      <div class="stat-label">Лінії</div>
+      <div class="stat-value" id="lines">0</div>
+    </div>
   </div>
 
-  <canvas id="canvas" width="320" height="320"></canvas>
-  <canvas id="particleCanvas"></canvas>
+  <div class="game-container">
+    <div>
+      <canvas id="tetris" width="140" height="240"></canvas>
+      <div class="controls">
+        <div></div>
+        <button class="btn" onclick="rotate()" id="rotateBtn">🔄</button>
+        <div></div>
+        <button class="btn" onclick="move(-1)" id="leftBtn">⬅️</button>
+        <button class="btn" onclick="drop()" id="downBtn">⬇️</button>
+        <button class="btn" onclick="move(1)" id="rightBtn">➡️</button>
+      </div>
+    </div>
 
-  <div class="controls">
-    <button class="btn btn-up" onclick="setDir('UP')" id="btnUp">⬆️</button>
-    <button class="btn btn-left" onclick="setDir('LEFT')" id="btnLeft">⬅️</button>
-    <button class="btn btn-down" onclick="setDir('DOWN')" id="btnDown">⬇️</button>
-    <button class="btn btn-right" onclick="setDir('RIGHT')" id="btnRight">➡️</button>
+    <div class="next-container">
+      <div class="next-box">
+        <div class="next-label">Далі</div>
+        <canvas id="nextCanvas" width="55" height="55"></canvas>
+      </div>
+    </div>
   </div>
 
   <div class="status-buttons">
     <button class="status-btn" id="pauseBtn" onclick="togglePause()">⏸️ ПАУЗА</button>
-    <button class="status-btn secondary" id="restartBtn" onclick="showDifficultyModal()">🔄 НОВА</button>
+    <button class="status-btn secondary" id="restartBtn" onclick="restartGame()">🔄 НОВА</button>
   </div>
 
   <!-- Game Over Modal -->
@@ -366,7 +427,7 @@
       <h1>ГРА ЗАКІНЧЕНА</h1>
       <div class="modal-stats">
         <div class="modal-stat-row">
-          <span class="modal-stat-label">Фінальний рахунок:</span>
+          <span class="modal-stat-label">Рахунок:</span>
           <span class="modal-stat-value" id="finalScore">0</span>
         </div>
         <div class="modal-stat-row">
@@ -374,34 +435,16 @@
           <span class="modal-stat-value" id="finalHighScore">0</span>
         </div>
         <div class="modal-stat-row">
-          <span class="modal-stat-label">Довжина змійки:</span>
-          <span class="modal-stat-value" id="finalLength">1</span>
+          <span class="modal-stat-label">Рівень:</span>
+          <span class="modal-stat-value" id="finalLevel">1</span>
         </div>
         <div class="modal-stat-row" id="newRecordRow" style="display: none; color: #FFD700;">
           <span>🎉 НОВИЙ РЕКОРД! 🎉</span>
         </div>
       </div>
       <div class="modal-buttons">
-        <button class="modal-btn restart" onclick="showDifficultyModal()">ГРАТИ ЩЕ РАЗ</button>
+        <button class="modal-btn restart" onclick="restartGame()">ГРАТИ ЩЕ РАЗ</button>
         <button class="modal-btn menu" onclick="location.reload()">МЕНЮ</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Difficulty Selection Modal -->
-  <div class="modal difficulty-modal" id="difficultyModal">
-    <div class="modal-content">
-      <h1 style="margin-bottom: 30px;">Виберіть рівень складності</h1>
-      <div class="difficulty-content">
-        <button class="difficulty-btn" onclick="startGame('easy')">
-          🟢 ЛЕГКО<br><span style="font-size: 12px; opacity: 0.7;">Повільна швидкість</span>
-        </button>
-        <button class="difficulty-btn" onclick="startGame('medium')">
-          🟡 НОРМАЛЬНО<br><span style="font-size: 12px; opacity: 0.7;">Середня швидкість</span>
-        </button>
-        <button class="difficulty-btn" onclick="startGame('hard')">
-          🔴 ВАЖКО<br><span style="font-size: 12px; opacity: 0.7;">Висока швидкість</span>
-        </button>
       </div>
     </div>
   </div>
@@ -413,152 +456,171 @@
       tg.ready();
     }
 
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
-    const particleCanvas = document.getElementById("particleCanvas");
-    const particleCtx = particleCanvas.getContext("2d");
-    
-    particleCanvas.width = window.innerWidth;
-    particleCanvas.height = window.innerHeight;
+    const canvas = document.getElementById('tetris');
+    const context = canvas.getContext('2d');
+    context.scale(10, 10);
 
-    const grid = 16;
-    const count = canvas.width / grid;
+    const nextCanvas = document.getElementById('nextCanvas');
+    const nextContext = nextCanvas.getContext('2d');
+    nextContext.scale(5.5, 5.5);
 
     let score = 0;
-    let highScore = localStorage.getItem('snakeHighScore') || 0;
+    let lines = 0;
+    let highScore = localStorage.getItem('tetrisHighScore') || 0;
+    let level = 1;
+    let gameState = 'playing';
+    let nextPiece = null;
+    let dropInterval = 800;
+    const baseDropInterval = 800;
+
     document.getElementById('highScore').innerText = highScore;
 
-    let snake = [{x: 10, y: 10}];
-    let food = {x: 5, y: 5};
-    let dx = 1, dy = 0;
-    let nextDx = 1, nextDy = 0;
-    let gameState = 'initial'; // 'initial', 'playing', 'paused', 'gameOver'
-    let gameLoopTimeout = null;
-    let currentSpeed = 160;
-    let difficulty = 'medium';
-    let particles = [];
+    const colors = [null, '#FF0D72', '#0DC2FF', '#0DFF72', '#F500F5', '#FF8E00', '#FFE135', '#3877FF'];
 
-    // Звуки (Web Audio API)
-    function playSound(freq, duration) {
-      try {
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        oscillator.frequency.value = freq;
-        oscillator.type = 'sine';
-        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-        oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + duration);
-      } catch (e) {
-        // Браузер може не підтримувати Web Audio API
+    function arenaSweep() {
+      let rowCount = 1;
+      outer: for (let y = arena.length - 1; y > 0; --y) {
+        for (let x = 0; x < arena[y].length; ++x) {
+          if (arena[y][x] === 0) continue outer;
+        }
+        const row = arena.splice(y, 1)[0].fill(0);
+        arena.unshift(row);
+        ++y;
+        lines++;
+        score += rowCount * 10;
+        rowCount *= 2;
+      }
+      updateStats();
+    }
+
+    function collide(arena, player) {
+      const [m, o] = [player.matrix, player.pos];
+      for (let y = 0; y < m.length; ++y) {
+        for (let x = 0; x < m[y].length; ++x) {
+          if (m[y][x] !== 0 && (arena[y + o.y] && arena[y + o.y][x + o.x]) !== 0) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    function createMatrix(w, h) {
+      const matrix = [];
+      while (h--) matrix.push(new Array(w).fill(0));
+      return matrix;
+    }
+
+    function createPiece(type) {
+      if (type === 'T') return [[0,1,0],[1,1,1],[0,0,0]];
+      if (type === 'O') return [[2,2],[2,2]];
+      if (type === 'L') return [[0,0,3],[3,3,3],[0,0,0]];
+      if (type === 'J') return [[4,0,0],[4,4,4],[0,0,0]];
+      if (type === 'I') return [[0,5,0,0],[0,5,0,0],[0,5,0,0],[0,5,0,0]];
+      if (type === 'S') return [[0,6,6],[6,6,0],[0,0,0]];
+      if (type === 'Z') return [[7,7,0],[0,7,7],[0,0,0]];
+    }
+
+    function draw() {
+      context.fillStyle = '#000';
+      context.fillRect(0, 0, 14, 24);
+      drawMatrix(arena, {x: 0, y: 0});
+      drawMatrix(player.matrix, player.pos);
+    }
+
+    function drawMatrix(matrix, offset) {
+      matrix.forEach((row, y) => {
+        row.forEach((value, x) => {
+          if (value !== 0) {
+            context.fillStyle = colors[value];
+            context.fillRect(x + offset.x, y + offset.y, 1, 1);
+          }
+        });
+      });
+    }
+
+    function merge(arena, player) {
+      player.matrix.forEach((row, y) => {
+        row.forEach((value, x) => {
+          if (value !== 0) {
+            arena[y + player.pos.y][x + player.pos.x] = value;
+          }
+        });
+      });
+    }
+
+    function playerDrop() {
+      player.pos.y++;
+      if (collide(arena, player)) {
+        player.pos.y--;
+        merge(arena, player);
+        playerReset();
+        arenaSweep();
+      }
+      dropCounter = 0;
+    }
+
+    function move(dir) {
+      if (gameState !== 'playing') return;
+      player.pos.x += dir;
+      if (collide(arena, player)) player.pos.x -= dir;
+    }
+
+    function drop() {
+      if (gameState !== 'playing') return;
+      playerDrop();
+    }
+
+    function rotate() {
+      if (gameState !== 'playing') return;
+      const pos = player.pos.x;
+      let offset = 1;
+      const m = player.matrix;
+      for (let y = 0; y < m.length; ++y) {
+        for (let x = 0; x < y; ++x) {
+          [m[x][y], m[y][x]] = [m[y][x], m[x][y]];
+        }
+      }
+      m.forEach(row => row.reverse());
+      while (collide(arena, player)) {
+        player.pos.x += offset;
+        offset = -(offset + (offset > 0 ? 1 : -1));
+        if (offset > m[0].length) {
+          player.matrix = m;
+          player.pos.x = pos;
+          return;
+        }
       }
     }
 
-    function createParticles(x, y, color) {
-      const particleCount = 8;
-      for (let i = 0; i < particleCount; i++) {
-        const angle = (Math.PI * 2 * i) / particleCount;
-        const velocity = 3 + Math.random() * 2;
-        particles.push({
-          x: x,
-          y: y,
-          vx: Math.cos(angle) * velocity,
-          vy: Math.sin(angle) * velocity,
-          life: 1,
-          color: color
+    function playerReset() {
+      const pieces = 'ILJOTSZ';
+      player.matrix = nextPiece || createPiece(pieces[pieces.length * Math.random() | 0]);
+      nextPiece = createPiece(pieces[pieces.length * Math.random() | 0]);
+      player.pos.y = 0;
+      player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
+      drawNextPiece();
+      if (collide(arena, player)) {
+        endGame();
+      }
+    }
+
+    function drawNextPiece() {
+      nextContext.fillStyle = '#000';
+      nextContext.fillRect(0, 0, 10, 10);
+      if (nextPiece) {
+        const offsetX = (4 - nextPiece.length) / 2;
+        const offsetY = (4 - nextPiece.length) / 2;
+        nextPiece.forEach((row, y) => {
+          row.forEach((value, x) => {
+            if (value !== 0) {
+              nextContext.fillStyle = colors[value];
+              nextContext.fillRect(x + offsetX, y + offsetY, 1, 1);
+            }
+          });
         });
       }
     }
-
-    function updateParticles() {
-      particleCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
-      particles = particles.filter(p => {
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vy += 0.1; // gravity
-        p.life -= 0.02;
-        
-        if (p.life > 0) {
-          particleCtx.globalAlpha = p.life;
-          particleCtx.fillStyle = p.color;
-          particleCtx.fillRect(p.x - 2, p.y - 2, 4, 4);
-          return true;
-        }
-        return false;
-      });
-      particleCtx.globalAlpha = 1;
-    }
-
-    function showDifficultyModal() {
-      document.getElementById('gameOverModal').classList.remove('active');
-      document.getElementById('difficultyModal').classList.add('active');
-    }
-
-    function startGame(difficultyLevel) {
-      difficulty = difficultyLevel;
-      document.getElementById('difficultyModal').classList.remove('active');
-      
-      if (difficultyLevel === 'easy') currentSpeed = 200;
-      else if (difficultyLevel === 'medium') currentSpeed = 160;
-      else if (difficultyLevel === 'hard') currentSpeed = 100;
-
-      resetGame();
-    }
-
-    function generateFood() {
-      let newFood;
-      do {
-        newFood = {
-          x: Math.floor(Math.random() * count),
-          y: Math.floor(Math.random() * count)
-        };
-      } while (snake.some(segment => segment.x === newFood.x && segment.y === newFood.y));
-      food = newFood;
-    }
-
-    function setDir(dir) {
-      if (gameState !== 'playing') return;
-      if (dir === 'UP' && dy === 0) { nextDx = 0; nextDy = -1; }
-      if (dir === 'DOWN' && dy === 0) { nextDx = 0; nextDy = 1; }
-      if (dir === 'LEFT' && dx === 0) { nextDx = -1; nextDy = 0; }
-      if (dir === 'RIGHT' && dx === 0) { nextDx = 1; nextDy = 0; }
-    }
-
-    // Клавіатурне керування для ПК
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "ArrowUp") setDir('UP');
-      if (e.key === "ArrowDown") setDir('DOWN');
-      if (e.key === "ArrowLeft") setDir('LEFT');
-      if (e.key === "ArrowRight") setDir('RIGHT');
-      if (e.key === " ") togglePause();
-    });
-
-    // Свайп-керування для мобільних
-    let touchStartX = 0, touchStartY = 0;
-    canvas.addEventListener('touchstart', (e) => {
-      const touch = e.touches[0];
-      touchStartX = touch.clientX;
-      touchStartY = touch.clientY;
-    });
-
-    canvas.addEventListener('touchend', (e) => {
-      if (!e.changedTouches.length) return;
-      const touch = e.changedTouches[0];
-      const diffX = touch.clientX - touchStartX;
-      const diffY = touch.clientY - touchStartY;
-      const threshold = 30;
-
-      if (Math.abs(diffX) > Math.abs(diffY)) {
-        if (diffX > threshold) setDir('RIGHT');
-        else if (diffX < -threshold) setDir('LEFT');
-      } else {
-        if (diffY > threshold) setDir('DOWN');
-        else if (diffY < -threshold) setDir('UP');
-      }
-    });
 
     function togglePause() {
       if (gameState === 'gameOver') return;
@@ -568,104 +630,32 @@
       } else if (gameState === 'paused') {
         gameState = 'playing';
         document.getElementById('pauseBtn').textContent = '⏸️ ПАУЗА';
-        loop();
       }
-    }
-
-    function resetGame() {
-      score = 0;
-      snake = [{x: 10, y: 10}];
-      dx = 1; dy = 0;
-      nextDx = 1; nextDy = 0;
-      gameState = 'playing';
-      document.getElementById('pauseBtn').textContent = '⏸️ ПАУЗА';
-      document.getElementById('score').innerText = score;
-      updateStats();
-      generateFood();
-      loop();
     }
 
     function updateStats() {
-      document.getElementById('length').innerText = snake.length;
-      const level = Math.floor(score / 5) + 1;
+      document.getElementById('score').innerText = score;
+      document.getElementById('lines').innerText = lines;
+      level = Math.floor(score / 200) + 1;
       document.getElementById('level').innerText = level;
+      dropInterval = Math.max(100, baseDropInterval - (level - 1) * 50);
     }
 
-    function update() {
-      dx = nextDx;
-      dy = nextDy;
-
-      const head = {x: snake[0].x + dx, y: snake[0].y + dy};
-
-      // Перевірка зіткнення зі стінами або собою
-      if (
-        head.x < 0 || head.x >= count || 
-        head.y < 0 || head.y >= count ||
-        snake.some(segment => segment.x === head.x && segment.y === head.y)
-      ) {
-        endGame();
-        return;
-      }
-
-      snake.unshift(head);
-
-      // Перевірка поїдання їжі
-      if (head.x === food.x && head.y === food.y) {
-        score += 1;
-        playSound(800, 0.1);
-        createParticles(food.x * grid + grid/2, food.y * grid + grid/2, '#4caf50');
-        document.getElementById('score').innerText = score;
-        updateStats();
-        generateFood();
-        
-        // Легке прискорення
-        if (currentSpeed > 50) {
-          currentSpeed -= 2;
-        }
-      } else {
-        snake.pop();
-      }
-    }
-
-    function draw() {
-      ctx.fillStyle = "#0e1621";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Малюємо їжу з сяйвом
-      ctx.fillStyle = "#e53935";
-      ctx.shadowColor = "rgba(229, 57, 53, 0.5)";
-      ctx.shadowBlur = 10;
-      ctx.fillRect(food.x * grid, food.y * grid, grid - 1, grid - 1);
-      ctx.shadowBlur = 0;
-
-      // Малюємо змійку
-      snake.forEach((segment, index) => {
-        if (index === 0) {
-          // Голова
-          ctx.fillStyle = "#81c784";
-          ctx.shadowColor = "rgba(129, 199, 132, 0.6)";
-          ctx.shadowBlur = 8;
-        } else {
-          ctx.fillStyle = "#4caf50";
-          ctx.shadowBlur = 0;
-        }
-        ctx.fillRect(segment.x * grid, segment.y * grid, grid - 1, grid - 1);
-      });
-      ctx.shadowBlur = 0;
-    }
-
-    function loop() {
-      if (gameState === 'playing') {
-        update();
-      }
-      draw();
-      updateParticles();
-      
-      if (gameState !== 'paused' && gameState !== 'initial') {
-        gameLoopTimeout = setTimeout(loop, currentSpeed);
-      } else if (gameState !== 'initial') {
-        gameLoopTimeout = setTimeout(loop, 16);
-      }
+    function restartGame() {
+      score = 0;
+      lines = 0;
+      level = 1;
+      dropInterval = baseDropInterval;
+      gameState = 'playing';
+      dropCounter = 0;
+      arena.forEach(row => row.fill(0));
+      player.pos = {x: 0, y: 0};
+      player.matrix = null;
+      nextPiece = null;
+      document.getElementById('pauseBtn').textContent = '⏸️ ПАУЗА';
+      document.getElementById('gameOverModal').classList.remove('active');
+      updateStats();
+      playerReset();
     }
 
     function endGame() {
@@ -673,23 +663,36 @@
       const isNewRecord = score > highScore;
       if (isNewRecord) {
         highScore = score;
-        localStorage.setItem('snakeHighScore', highScore);
-        playSound(1200, 0.3);
-      } else {
-        playSound(300, 0.3);
+        localStorage.setItem('tetrisHighScore', highScore);
       }
-      
       document.getElementById('finalScore').innerText = score;
       document.getElementById('finalHighScore').innerText = highScore;
-      document.getElementById('finalLength').innerText = snake.length;
+      document.getElementById('finalLevel').innerText = level;
       document.getElementById('newRecordRow').style.display = isNewRecord ? 'flex' : 'none';
       document.getElementById('gameOverModal').classList.add('active');
     }
 
-    // Показуємо модаль вибору складності при завантаженні
-    window.addEventListener('load', () => {
-      showDifficultyModal();
-    });
+    let dropCounter = 0;
+    let lastTime = 0;
+
+    function update(time = 0) {
+      const deltaTime = time - lastTime;
+      lastTime = time;
+      
+      if (gameState === 'playing') {
+        dropCounter += deltaTime;
+        if (dropCounter > dropInterval) playerDrop();
+      }
+      
+      draw();
+      drawNextPiece();
+      requestAnimationFrame(update);
+    }
+
+    const arena = createMatrix(10, 20);
+    const player = { pos: {x: 0, y: 0}, matrix: null };
+    playerReset();
+    update();
   </script>
 </body>
 </html>
