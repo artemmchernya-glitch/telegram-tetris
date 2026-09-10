@@ -161,7 +161,7 @@
     }
 
     .modal.active {
-      display: flex;
+      display: flex !important;
     }
 
     .modal-content {
@@ -257,10 +257,6 @@
     }
 
     /* Difficulty Selection Modal */
-    .difficulty-modal.active {
-      display: flex !important;
-    }
-
     .difficulty-content {
       display: flex;
       flex-direction: column;
@@ -283,6 +279,10 @@
       background: #4caf50;
       color: #000;
       transform: scale(0.95);
+    }
+
+    .difficulty-btn:hover {
+      background: rgba(76, 175, 80, 0.2);
     }
 
     /* Particle effect */
@@ -389,17 +389,17 @@
   </div>
 
   <!-- Difficulty Selection Modal -->
-  <div class="modal difficulty-modal" id="difficultyModal">
+  <div class="modal" id="difficultyModal">
     <div class="modal-content">
-      <h1 style="margin-bottom: 30px;">Виберіть рівень складності</h1>
+      <h1 style="margin-bottom: 30px; color: #4caf50;">Виберіть рівень складності</h1>
       <div class="difficulty-content">
-        <button class="difficulty-btn" onclick="startGame('easy')">
+        <button class="difficulty-btn" id="easyBtn" onclick="startGame('easy')">
           🟢 ЛЕГКО<br><span style="font-size: 12px; opacity: 0.7;">Повільна швидкість</span>
         </button>
-        <button class="difficulty-btn" onclick="startGame('medium')">
+        <button class="difficulty-btn" id="mediumBtn" onclick="startGame('medium')">
           🟡 НОРМАЛЬНО<br><span style="font-size: 12px; opacity: 0.7;">Середня швидкість</span>
         </button>
-        <button class="difficulty-btn" onclick="startGame('hard')">
+        <button class="difficulty-btn" id="hardBtn" onclick="startGame('hard')">
           🔴 ВАЖКО<br><span style="font-size: 12px; opacity: 0.7;">Висока швидкість</span>
         </button>
       </div>
@@ -437,6 +437,7 @@
     let currentSpeed = 160;
     let difficulty = 'medium';
     let particles = [];
+    let baseSpeed = 160; // Збережена базова швидкість для режиму
 
     // Звуки (Web Audio API)
     function playSound(freq, duration) {
@@ -493,18 +494,36 @@
     }
 
     function showDifficultyModal() {
+      console.log('📋 Показуємо модаль вибору складності');
       document.getElementById('gameOverModal').classList.remove('active');
       document.getElementById('difficultyModal').classList.add('active');
+      gameState = 'initial';
     }
 
     function startGame(difficultyLevel) {
-      difficulty = difficultyLevel;
-      document.getElementById('difficultyModal').classList.remove('active');
+      console.log('🎮 Запуск гри на рівні:', difficultyLevel);
       
-      if (difficultyLevel === 'easy') currentSpeed = 200;
-      else if (difficultyLevel === 'medium') currentSpeed = 160;
-      else if (difficultyLevel === 'hard') currentSpeed = 100;
-
+      difficulty = difficultyLevel;
+      
+      // Встановлюємо швидкість на основі складності
+      if (difficultyLevel === 'easy') {
+        currentSpeed = 200;
+        baseSpeed = 200;
+      } else if (difficultyLevel === 'medium') {
+        currentSpeed = 160;
+        baseSpeed = 160;
+      } else if (difficultyLevel === 'hard') {
+        currentSpeed = 100;
+        baseSpeed = 100;
+      }
+      
+      console.log('⚡ Швидкість установлена на:', currentSpeed);
+      
+      // Закриваємо модаль
+      const modal = document.getElementById('difficultyModal');
+      modal.classList.remove('active');
+      
+      // Запускаємо гру
       resetGame();
     }
 
@@ -561,7 +580,7 @@
     });
 
     function togglePause() {
-      if (gameState === 'gameOver') return;
+      if (gameState === 'gameOver' || gameState === 'initial') return;
       if (gameState === 'playing') {
         gameState = 'paused';
         document.getElementById('pauseBtn').textContent = '▶️ ПРОДОВЖИТИ';
@@ -573,6 +592,7 @@
     }
 
     function resetGame() {
+      console.log('🔄 Перезагрузка гри. Швидкість:', currentSpeed);
       score = 0;
       snake = [{x: 10, y: 10}];
       dx = 1; dy = 0;
@@ -618,8 +638,8 @@
         updateStats();
         generateFood();
         
-        // Легке прискорення
-        if (currentSpeed > 50) {
+        // Легке прискорення від базової швидкості
+        if (currentSpeed > baseSpeed - 50) {
           currentSpeed -= 2;
         }
       } else {
@@ -687,7 +707,8 @@
     }
 
     // Показуємо модаль вибору складності при завантаженні
-    window.addEventListener('load', () => {
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('✅ Сторінка завантажена. Показуємо модаль вибору складності');
       showDifficultyModal();
     });
   </script>
