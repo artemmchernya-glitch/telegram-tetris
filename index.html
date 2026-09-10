@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Тетріс WebApp</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      background: #181818;
+      color: #fff;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      padding: 10px;
+      touch-action: manipulation;
+    }
+    h2 { margin: 5px 0 10px 0; }
+    #score { font-size: 20px; font-weight: bold; margin-bottom: 15px; color: #4CAF50; }
+    canvas {
+      border: 3px solid #444;
+      background: #000;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0,255,100,0.15);
+    }
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(3, 70px);
+      grid-gap: 12px;
+      margin-top: 20px;
+    }
+    .btn {
+      width: 70px;
+      height: 70px;
+      background: #2a2a2a;
+      color: #fff;
+      font-size: 24px;
+      border: 1px solid #555;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    }
+    .btn:active {
+      background: #444;
+      transform: scale(0.95);
+    }
+  </style>
+</head>
+<body>
+  <h2>🎮 Тетріс</h2>
+  <div id="score">Рахунок: 0</div>
+  <canvas id="tetris" width="240" height="400"></canvas>
+
+  <div class="controls">
+    <div></div>
+    <div class="btn" onclick="rotate()">🔄</div>
+    <div></div>
+    <div class="btn" onclick="move(-1)">⬅️</div>
+    <div class="btn" onclick="drop()">⬇️</div>
+    <div class="btn" onclick="move(1)">➡️</div>
+  </div>
+
+  <script>
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.expand();
+      tg.ready();
+    }
+
+    const canvas = document.getElementById('tetris');
+    const context = canvas.getContext('2d');
+    context.scale(20, 20);
+
+    let score = 0;
+
+    function arenaSweep() {
+      let rowCount = 1;
+      outer: for (let y = arena.length - 1; y > 0; --y) {
+        for (let x = 0; x < arena[y].length; ++x) {
+          if (arena[y][x] === 0) continue outer;
+        }
+        const row = arena.splice(y, 1)[0].fill(0);
+        arena.unshift(row);
+        ++y;
+        score += rowCount * 10;
+        rowCount *= 2;
+      }
+      document.getElementById('score').innerText = 'Рахунок: ' + score;
+    }
+
+    function collide(arena, player) {
+      const [m, o] = [player.matrix, player.pos];
+      for (let y = 0; y < m.length; ++y) {
+        for (let x = 0; x < m[y].length; ++x) {
+          if (m[y][x] !== 0 && (arena[y + o.y] && arena[y + o.y][x + o.x]) !== 0) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    function createMatrix(w, h) {
+      const matrix = [];
+      while (h--) matrix.push(new Array(w).fill(0));
+      return matrix;
+    }
+
+    function createPiece(type) {
+      if (type === 'T') return [[0,1,0],[1,1,1],[0,0,0]];
+      if (type === 'O') return [[2,2],[2,2]];
+      if (type === 'L') return [[0,0,3],[3,3,3],[0,0,0]];
+      if (type === 'J') return [[4,0,0],[4,4,4],[0,0,0]];
+      if (type === 'I') return [[0,5,0,0],[0,5,0,0],[0,5,0,0],[0,5,0,0]];
+      if (type === 'S') return [[0,6,6],[6,6,0],[0,0,0]];
+      if (type === 'Z') return [[7,7,0],[0,7,7],[0,0,0]];
+    }
+
+    function draw() {
+      context.fillStyle = '#000';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      drawMatrix(arena, {x: 0, y: 0});
+      drawMatrix(player.matrix, player.pos);
+    }
+
+    const colors = [null, '#FF0D72', '#0DC2FF', '#0DFF72', '#F500F5', '#FF8E00', '#FFE135', '#3877FF'];
+
+    function drawMatrix(matrix, offset) {
+      matrix.forEach((row, y) => {
+        row.forEach((value, x) => {
+          if (value !== 0) {
+            context.fillStyle = colors[value];
+            context.fillRect(x + offset.x, y + offset.y, 1, 1);
+          }
+        });
+      });
+    }
+
+    function merge(arena, player) {
+      player.matrix.forEach((row, y) => {
+        row.forEach((value, x) => {
+          if (value !== 0) {
+            arena[y + player.pos.y][x + player.pos.x] = value;
+          }
+        });
+      });
+    }
+
+    function playerDrop() {
+      player.pos.y++;
+      if (collide(arena, player)) {
+        player.pos.y--;
+        merge(arena, player);
+        playerReset();
+        arenaSweep();
+      }
+      dropCounter = 0;
+    }
+
+    function move(dir) {
+      player.pos.x += dir;
+      if (collide(arena, player)) player.pos.x -= dir;
+    }
+
+    function drop() { playerDrop(); }
+
+    function rotate() {
+      const pos = player.pos.x;
+      let offset = 1;
+      const m = player.matrix;
+      for (let y = 0; y < m.length; ++y) {
+        for (let x = 0; x < y; ++x) {
+          [m[x][y], m[y][x]] = [m[y][x], m[x][y]];
+        }
+      }
+      m.forEach(row => row.reverse());
+      while (collide(arena, player)) {
+        player.pos.x += offset;
+        offset = -(offset + (offset > 0 ? 1 : -1));
+        if (offset > m[0].length) {
+          player.matrix = m;
+          player.pos.x = pos;
+          return;
+        }
+      }
+    }
+
+    function playerReset() {
+      const pieces = 'ILJOTSZ';
+      player.matrix = createPiece(pieces[pieces.length * Math.random() | 0]);
+      player.pos.y = 0;
+      player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
+      if (collide(arena, player)) {
+        arena.forEach(row => row.fill(0));
+        score = 0;
+        document.getElementById('score').innerText = 'Рахунок: ' + score;
+      }
+    }
+
+    let dropCounter = 0;
+    let dropInterval = 1000;
+    let lastTime = 0;
+
+    function update(time = 0) {
+      const deltaTime = time - lastTime;
+      lastTime = time;
+      dropCounter += deltaTime;
+      if (dropCounter > dropInterval) playerDrop();
+      draw();
+      requestAnimationFrame(update);
+    }
+
+    const arena = createMatrix(12, 20);
+    const player = { pos: {x: 0, y: 0}, matrix: null };
+    playerReset();
+    update();
+  </script>
+</body>
+</html>
