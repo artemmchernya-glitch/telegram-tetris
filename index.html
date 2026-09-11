@@ -33,18 +33,20 @@
 
     .game-container {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       gap: 5px;
-      align-items: center;
+      align-items: flex-start;
+      justify-content: center;
       width: 100%;
     }
 
     .stats-container {
       display: grid;
-      grid-template-columns: repeat(3, 38px);
-      grid-template-rows: auto auto;
+      grid-template-columns: repeat(2, 38px);
+      grid-template-rows: auto auto auto;
       gap: 4px;
       width: auto;
+      flex-shrink: 0;
     }
 
     .stat-box {
@@ -82,7 +84,7 @@
       padding: 2px;
       text-align: center;
       grid-column: 1 / -1;
-      width: 120px;
+      width: 100%;
       height: auto;
       display: flex;
       flex-direction: column;
@@ -351,7 +353,194 @@
       z-index: 500;
     }
 
+    @media (min-width: 375px) and (max-width: 500px) {
+      /* iPhone SE */
+      body {
+        padding: 4px;
+      }
+
+      h1 {
+        font-size: 20px;
+        margin: 6px 0;
+      }
+
+      .game-container {
+        gap: 4px;
+      }
+
+      .stats-container {
+        grid-template-columns: repeat(2, 36px);
+        grid-template-rows: auto auto auto;
+        gap: 4px;
+      }
+
+      .stat-box {
+        width: 36px;
+        height: 36px;
+        padding: 3px;
+        border: 1px solid rgba(76, 175, 80, 0.3);
+      }
+
+      .stat-label {
+        font-size: 5px;
+      }
+
+      .stat-value {
+        font-size: 13px;
+      }
+
+      #nextCanvas {
+        width: 65px;
+        height: 45px;
+      }
+
+      .controls {
+        grid-template-columns: repeat(3, 42px);
+        grid-template-rows: repeat(2, 38px);
+        gap: 4px;
+      }
+
+      .btn {
+        font-size: 15px;
+      }
+
+      .status-btn {
+        padding: 7px 11px;
+        font-size: 11px;
+      }
+    }
+
+    @media (min-width: 380px) and (max-width: 420px) {
+      /* iPhone 12 Mini */
+      body {
+        padding: 4px;
+      }
+
+      h1 {
+        font-size: 21px;
+        margin: 6px 0;
+      }
+
+      .game-container {
+        gap: 6px;
+      }
+
+      #canvas {
+        width: 160px;
+        height: 320px;
+      }
+
+      .stats-container {
+        grid-template-columns: repeat(2, 46px);
+        grid-template-rows: auto auto auto;
+        gap: 5px;
+      }
+
+      .stat-box {
+        width: 46px;
+        height: 46px;
+      }
+
+      .stat-value {
+        font-size: 16px;
+      }
+
+      .controls {
+        grid-template-columns: repeat(3, 52px);
+        grid-template-rows: repeat(2, 46px);
+        gap: 5px;
+        margin-top: 6px;
+      }
+
+      .btn {
+        font-size: 16px;
+        border: 1px solid #4caf50;
+      }
+
+      .rotation-btn {
+        font-size: 11px;
+      }
+
+      .status-btn {
+        padding: 8px 12px;
+        font-size: 11px;
+      }
+    }
+
+    @media (min-width: 390px) and (max-width: 430px) {
+      /* iPhone 12 */
+      body {
+        padding: 5px;
+      }
+
+      h1 {
+        font-size: 22px;
+        margin: 7px 0;
+      }
+
+      .game-container {
+        gap: 8px;
+      }
+
+      #canvas {
+        width: 180px;
+        height: 360px;
+      }
+
+      .stats-container {
+        grid-template-columns: repeat(2, 52px);
+        grid-template-rows: auto auto auto;
+        gap: 6px;
+      }
+
+      .stat-box {
+        width: 52px;
+        height: 52px;
+        padding: 5px;
+        border: 1px solid rgba(76, 175, 80, 0.3);
+      }
+
+      .stat-label {
+        font-size: 7px;
+      }
+
+      .stat-value {
+        font-size: 18px;
+      }
+
+      .next-piece {
+        width: 100%;
+      }
+
+      #nextCanvas {
+        width: 100px;
+        height: 60px;
+      }
+
+      .controls {
+        grid-template-columns: repeat(3, 58px);
+        grid-template-rows: repeat(2, 52px);
+        gap: 6px;
+        margin-top: 8px;
+      }
+
+      .btn {
+        font-size: 18px;
+        border: 1px solid #4caf50;
+      }
+
+      .rotation-btn {
+        font-size: 12px;
+      }
+
+      .status-btn {
+        padding: 9px 14px;
+        font-size: 13px;
+      }
+    }
+
     @media (min-width: 500px) {
+      /* Більші екрани - планшети, комп'ютери */
       body {
         padding: 8px;
       }
@@ -365,6 +554,7 @@
         flex-direction: row;
         gap: 15px;
         align-items: flex-start;
+        justify-content: center;
       }
 
       .stats-container {
@@ -374,6 +564,7 @@
         width: auto !important;
         max-width: 280px !important;
         grid-template-columns: unset !important;
+        flex-shrink: 0;
       }
 
       .stat-box {
@@ -482,6 +673,10 @@
       h1 {
         font-size: 32px;
         margin: 15px 0;
+      }
+
+      .game-container {
+        gap: 20px;
       }
 
       .stat-box {
@@ -713,7 +908,7 @@
     let currentPiece = null;
     let nextPiece = null;
     let score = 0;
-    let highScore = localStorage.getItem('tetrisHighScore') || 0;
+    let highScore = 0;
     let lines = 0;
     let level = 1;
     let gameState = 'initial';
@@ -722,6 +917,14 @@
     let difficulty = 'medium';
     let particles = [];
     let baseSpeed = 800;
+
+    // Безпечне завантаження highScore
+    try {
+      highScore = localStorage.getItem('tetrisHighScore') || 0;
+    } catch (e) {
+      // localStorage недоступний при відкритті файлу з диску
+      highScore = 0;
+    }
 
     document.getElementById('highScore').innerText = highScore;
 
@@ -1064,7 +1267,12 @@
       
       if (isNewRecord) {
         highScore = score;
-        localStorage.setItem('tetrisHighScore', highScore);
+        try {
+          localStorage.setItem('tetrisHighScore', highScore);
+        } catch (e) {
+          // localStorage недоступний при відкритті файлу з диску
+          console.log('Рекорд не збережено (localStorage недоступний)');
+        }
         playSound(1200, 0.3);
       } else {
         playSound(300, 0.3);
