@@ -19,48 +19,58 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       min-height: 100vh;
-      padding: 10px;
+      padding: 3px;
+      overflow-x: hidden;
     }
 
     h1 {
-      font-size: 32px;
-      margin: 15px 0;
+      font-size: 18px;
+      margin: 5px 0;
       text-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
     }
 
     .game-container {
       display: flex;
-      gap: 20px;
-      align-items: flex-start;
+      flex-direction: column;
+      gap: 5px;
+      align-items: center;
+      width: 100%;
     }
 
     .stats-container {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      width: 100%;
-      max-width: 280px;
+      display: grid;
+      grid-template-columns: repeat(3, 38px);
+      grid-template-rows: auto auto;
+      gap: 4px;
+      width: auto;
     }
 
     .stat-box {
       text-align: center;
-      padding: 15px;
+      padding: 3px;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(76, 175, 80, 0.3);
-      border-radius: 8px;
+      border-radius: 4px;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
 
     .stat-label {
-      font-size: 11px;
+      font-size: 5px;
       color: #888;
       text-transform: uppercase;
-      margin-bottom: 4px;
+      margin-bottom: 1px;
+      line-height: 1;
     }
 
     .stat-value {
-      font-size: 24px;
+      font-size: 12px;
       font-weight: bold;
       color: #4caf50;
     }
@@ -68,62 +78,72 @@
     .next-piece {
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(76, 175, 80, 0.3);
-      border-radius: 8px;
-      padding: 15px;
+      border-radius: 4px;
+      padding: 2px;
       text-align: center;
+      grid-column: 1 / -1;
+      width: 120px;
+      height: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
 
     .next-piece-label {
-      font-size: 11px;
+      font-size: 5px;
       color: #888;
       text-transform: uppercase;
-      margin-bottom: 10px;
+      margin-bottom: 1px;
+      line-height: 1;
     }
 
     #nextCanvas {
       background: #0e1621;
       border: 1px solid rgba(76, 175, 80, 0.2);
-      border-radius: 4px;
+      border-radius: 2px;
       display: block;
-      width: 100%;
-      height: 100px;
+      width: 60px;
+      height: 45px;
     }
 
     #canvas {
       background: #0e1621;
-      border: 3px solid #4caf50;
-      border-radius: 8px;
-      box-shadow: 0 0 25px rgba(76, 175, 80, 0.3);
+      border: 2px solid #4caf50;
+      border-radius: 4px;
+      box-shadow: 0 0 15px rgba(76, 175, 80, 0.3);
       image-rendering: pixelated;
+      width: 120px;
+      height: 240px;
     }
 
     .controls {
       display: grid;
-      grid-template-columns: repeat(3, 70px);
-      grid-template-rows: repeat(2, 60px);
-      gap: 10px;
-      margin-top: 20px;
+      grid-template-columns: repeat(3, 38px);
+      grid-template-rows: repeat(2, 35px);
+      gap: 4px;
+      margin-top: 5px;
     }
 
     .btn {
       background: linear-gradient(135deg, #2b5278 0%, #1a3a52 100%);
-      border: 2px solid #4caf50;
-      border-radius: 8px;
+      border: 1px solid #4caf50;
+      border-radius: 4px;
       color: white;
-      font-size: 24px;
+      font-size: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       transition: all 0.2s ease;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     }
 
     .btn:active {
       background: #4caf50;
       color: #000;
       transform: scale(0.92);
-      box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+      box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
     }
 
     .btn:disabled {
@@ -131,35 +151,36 @@
       cursor: not-allowed;
     }
 
-    .btn-up { grid-column: 2; grid-row: 1; }
     .btn-left { grid-column: 1; grid-row: 2; }
     .btn-down { grid-column: 2; grid-row: 2; }
     .btn-right { grid-column: 3; grid-row: 2; }
 
     .rotation-btn {
-      grid-column: 1 / 4;
-      margin-top: 10px;
+      grid-column: 1 / -1;
+      font-size: 10px;
+      margin-top: 4px;
     }
 
     .status-buttons {
       display: flex;
-      gap: 10px;
-      margin-top: 20px;
+      gap: 4px;
+      margin-top: 5px;
       flex-wrap: wrap;
       justify-content: center;
+      width: 100%;
     }
 
     .status-btn {
-      padding: 12px 24px;
+      padding: 6px 10px;
       background: #4caf50;
       color: #000;
       border: none;
-      border-radius: 8px;
-      font-size: 16px;
+      border-radius: 4px;
+      font-size: 10px;
       font-weight: bold;
       cursor: pointer;
       transition: all 0.2s ease;
-      box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+      box-shadow: 0 1px 3px rgba(76, 175, 80, 0.3);
     }
 
     .status-btn:active {
@@ -192,6 +213,7 @@
       z-index: 1000;
       align-items: center;
       justify-content: center;
+      padding: 10px;
     }
 
     .modal.active {
@@ -201,12 +223,15 @@
     .modal-content {
       background: linear-gradient(135deg, #1a2332 0%, #0a0e1b 100%);
       border: 2px solid #4caf50;
-      border-radius: 16px;
-      padding: 40px 30px;
+      border-radius: 12px;
+      padding: 20px 15px;
       text-align: center;
-      box-shadow: 0 0 50px rgba(76, 175, 80, 0.4);
+      box-shadow: 0 0 40px rgba(76, 175, 80, 0.4);
       animation: slideUp 0.3s ease;
-      max-width: 90%;
+      max-width: 95%;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
     }
 
     @keyframes slideUp {
@@ -221,23 +246,23 @@
     }
 
     .modal h1 {
-      font-size: 42px;
+      font-size: 26px;
       color: #e53935;
-      margin: 0 0 20px 0;
+      margin: 0 0 15px 0;
       text-shadow: 0 0 20px rgba(229, 57, 53, 0.5);
     }
 
     .modal-stats {
-      margin: 30px 0;
+      margin: 20px 0;
       text-align: left;
     }
 
     .modal-stat-row {
       display: flex;
       justify-content: space-between;
-      padding: 12px;
+      padding: 8px;
       border-bottom: 1px solid rgba(76, 175, 80, 0.2);
-      font-size: 16px;
+      font-size: 14px;
     }
 
     .modal-stat-row:last-child {
@@ -255,27 +280,27 @@
 
     .modal-buttons {
       display: flex;
-      gap: 12px;
-      margin-top: 30px;
+      gap: 8px;
+      margin-top: 20px;
       justify-content: center;
       flex-wrap: wrap;
     }
 
     .modal-btn {
-      padding: 14px 28px;
-      font-size: 16px;
+      padding: 10px 16px;
+      font-size: 14px;
       font-weight: bold;
       border: none;
-      border-radius: 8px;
+      border-radius: 6px;
       cursor: pointer;
       transition: all 0.2s ease;
+      flex: 1;
+      min-width: 120px;
     }
 
     .modal-btn.restart {
       background: #4caf50;
       color: #000;
-      flex: 1;
-      min-width: 150px;
     }
 
     .modal-btn.restart:active {
@@ -286,24 +311,22 @@
       background: rgba(255, 255, 255, 0.1);
       color: #fff;
       border: 1px solid #4caf50;
-      flex: 1;
-      min-width: 150px;
     }
 
     /* Difficulty Selection Modal */
     .difficulty-content {
       display: flex;
       flex-direction: column;
-      gap: 15px;
+      gap: 12px;
     }
 
     .difficulty-btn {
-      padding: 20px;
+      padding: 15px;
       background: rgba(76, 175, 80, 0.1);
       border: 2px solid #4caf50;
-      border-radius: 8px;
+      border-radius: 6px;
       color: #4caf50;
-      font-size: 18px;
+      font-size: 16px;
       font-weight: bold;
       cursor: pointer;
       transition: all 0.3s ease;
@@ -328,40 +351,212 @@
       z-index: 500;
     }
 
-    @media (max-width: 600px) {
+    @media (min-width: 500px) {
+      body {
+        padding: 8px;
+      }
+
       h1 {
-        font-size: 24px;
+        font-size: 26px;
+        margin: 8px 0;
       }
 
       .game-container {
-        flex-direction: column;
+        flex-direction: row;
         gap: 15px;
+        align-items: flex-start;
       }
 
       .stats-container {
-        max-width: 100%;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px;
+        width: auto !important;
+        max-width: 280px !important;
+        grid-template-columns: unset !important;
+      }
+
+      .stat-box {
+        padding: 12px !important;
+        width: auto !important;
+        height: auto !important;
+        display: block !important;
+        text-align: center;
+        border: 1px solid rgba(76, 175, 80, 0.3) !important;
+        border-radius: 6px !important;
+      }
+
+      .stat-label {
+        font-size: 10px !important;
+        margin-bottom: 3px !important;
+      }
+
+      .stat-value {
+        font-size: 20px !important;
+      }
+
+      .next-piece {
+        padding: 12px !important;
+        width: auto !important;
+        grid-column: unset !important;
+        display: block !important;
+      }
+
+      .next-piece-label {
+        font-size: 10px !important;
+        margin-bottom: 8px !important;
+      }
+
+      #nextCanvas {
+        width: 100% !important;
+        height: 90px !important;
+      }
+
+      #canvas {
+        width: 180px;
+        height: 360px;
+        border: 3px solid #4caf50;
       }
 
       .controls {
         grid-template-columns: repeat(3, 60px);
         grid-template-rows: repeat(2, 50px);
+        gap: 8px;
+        margin-top: 12px;
       }
 
       .btn {
-        font-size: 20px;
+        font-size: 18px;
+        border: 2px solid #4caf50;
+        border-radius: 6px;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
       }
 
-      #canvas {
-        width: 100%;
-        height: auto;
+      .rotation-btn {
+        font-size: 11px;
+        margin-top: 8px;
+      }
+
+      .status-buttons {
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .status-btn {
+        padding: 10px 18px;
+        font-size: 13px;
+        box-shadow: 0 2px 6px rgba(76, 175, 80, 0.3);
       }
 
       .modal-content {
-        padding: 25px 20px;
+        padding: 30px 25px;
       }
 
       .modal h1 {
+        font-size: 36px;
+        margin-bottom: 18px;
+      }
+
+      .modal-stat-row {
+        padding: 10px;
+        font-size: 15px;
+      }
+
+      .modal-btn {
+        padding: 12px 24px;
+        font-size: 15px;
+        min-width: 130px;
+      }
+
+      .difficulty-btn {
+        padding: 18px;
+        font-size: 16px;
+      }
+    }
+
+    @media (min-width: 800px) {
+      body {
+        padding: 10px;
+      }
+
+      h1 {
         font-size: 32px;
+        margin: 15px 0;
+      }
+
+      .stat-box {
+        padding: 15px !important;
+      }
+
+      .stat-label {
+        font-size: 11px !important;
+      }
+
+      .stat-value {
+        font-size: 24px !important;
+      }
+
+      .next-piece {
+        padding: 15px !important;
+      }
+
+      .next-piece-label {
+        font-size: 11px !important;
+        margin-bottom: 10px !important;
+      }
+
+      #nextCanvas {
+        height: 100px !important;
+      }
+
+      #canvas {
+        width: 200px;
+        height: 400px;
+      }
+
+      .controls {
+        grid-template-columns: repeat(3, 70px);
+        grid-template-rows: repeat(2, 60px);
+        gap: 10px;
+      }
+
+      .btn {
+        font-size: 24px;
+        border: 2px solid #4caf50;
+      }
+
+      .rotation-btn {
+        font-size: 12px;
+      }
+
+      .status-btn {
+        padding: 12px 24px;
+        font-size: 16px;
+      }
+
+      .modal-content {
+        padding: 40px 30px;
+      }
+
+      .modal h1 {
+        font-size: 42px;
+        margin-bottom: 20px;
+      }
+
+      .modal-stat-row {
+        padding: 12px;
+        font-size: 16px;
+      }
+
+      .modal-btn {
+        padding: 14px 28px;
+        font-size: 16px;
+        min-width: 150px;
+      }
+
+      .difficulty-btn {
+        padding: 20px;
+        font-size: 18px;
       }
     }
   </style>
@@ -389,9 +584,17 @@
         <div class="stat-label">Рівень</div>
         <div class="stat-value" id="level">1</div>
       </div>
+      <div class="stat-box">
+        <div class="stat-label">Темп</div>
+        <div class="stat-value" id="speed">1</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Макс</div>
+        <div class="stat-value" id="maxScore">0</div>
+      </div>
       <div class="next-piece">
-        <div class="next-piece-label">Наступна фігура</div>
-        <canvas id="nextCanvas" width="100" height="100"></canvas>
+        <div class="next-piece-label">Наступна</div>
+        <canvas id="nextCanvas" width="80" height="60"></canvas>
       </div>
     </div>
   </div>
@@ -443,16 +646,16 @@
   <!-- Difficulty Selection Modal -->
   <div class="modal" id="difficultyModal">
     <div class="modal-content">
-      <h1 style="margin-bottom: 30px; color: #4caf50;">Виберіть рівень складності</h1>
+      <h1 style="margin-bottom: 20px; color: #4caf50;">Виберіть рівень складності</h1>
       <div class="difficulty-content">
         <button class="difficulty-btn" id="easyBtn" onclick="startGame('easy')">
-          🟢 ЛЕГКО<br><span style="font-size: 12px; opacity: 0.7;">Повільна швидкість</span>
+          🟢 ЛЕГКО<br><span style="font-size: 11px; opacity: 0.7;">Повільна швидкість</span>
         </button>
         <button class="difficulty-btn" id="mediumBtn" onclick="startGame('medium')">
-          🟡 НОРМАЛЬНО<br><span style="font-size: 12px; opacity: 0.7;">Середня швидкість</span>
+          🟡 НОРМАЛЬНО<br><span style="font-size: 11px; opacity: 0.7;">Середня швидкість</span>
         </button>
         <button class="difficulty-btn" id="hardBtn" onclick="startGame('hard')">
-          🔴 ВАЖКО<br><span style="font-size: 12px; opacity: 0.7;">Висока швидкість</span>
+          🔴 ВАЖКО<br><span style="font-size: 11px; opacity: 0.7;">Висока швидкість</span>
         </button>
       </div>
     </div>
