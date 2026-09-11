@@ -912,11 +912,11 @@
     let lines = 0;
     let level = 1;
     let gameState = 'initial';
-    let gameLoopTimeout = null;
     let currentSpeed = 800;
     let difficulty = 'medium';
     let particles = [];
     let baseSpeed = 800;
+    let lastGameUpdateTime = 0;
 
     // Безпечне завантаження highScore
     try {
@@ -1060,10 +1060,10 @@
     }
 
     function createParticles(x, y, color) {
-      const particleCount = 8;
+      const particleCount = 5;  // було 8
       for (let i = 0; i < particleCount; i++) {
         const angle = (Math.PI * 2 * i) / particleCount;
-        const velocity = 3 + Math.random() * 2;
+        const velocity = 2 + Math.random() * 1.5;  // було 3 + 2
         particles.push({
           x: x,
           y: y,
@@ -1104,10 +1104,7 @@
           const cell = board[y][x];
           if (cell) {
             ctx.fillStyle = COLORS[cell];
-            ctx.shadowColor = `${COLORS[cell]}80`;
-            ctx.shadowBlur = 8;
             ctx.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE - 1, BLOCK_SIZE - 1);
-            ctx.shadowBlur = 0;
           }
         }
       }
@@ -1116,30 +1113,21 @@
       if (currentPiece) {
         const blocks = currentPiece.getBlocks();
         ctx.fillStyle = COLORS[currentPiece.type];
-        ctx.shadowColor = `${COLORS[currentPiece.type]}80`;
-        ctx.shadowBlur = 8;
         
         blocks.forEach(([x, y]) => {
           if (y >= 0) {
             ctx.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE - 1, BLOCK_SIZE - 1);
           }
         });
-        ctx.shadowBlur = 0;
       }
 
-      // Draw grid
+      // Draw grid (рідше - тільки вертикальні лінії)
       ctx.strokeStyle = 'rgba(76, 175, 80, 0.1)';
       ctx.lineWidth = 0.5;
       for (let i = 0; i <= COLS; i++) {
         ctx.beginPath();
         ctx.moveTo(i * BLOCK_SIZE, 0);
         ctx.lineTo(i * BLOCK_SIZE, canvas.height);
-        ctx.stroke();
-      }
-      for (let i = 0; i <= ROWS; i++) {
-        ctx.beginPath();
-        ctx.moveTo(0, i * BLOCK_SIZE);
-        ctx.lineTo(canvas.width, i * BLOCK_SIZE);
         ctx.stroke();
       }
     }
@@ -1152,8 +1140,6 @@
         const blocks = nextPiece.shape;
         const blockSize = nextCanvas.width / 6;
         nextCtx.fillStyle = COLORS[nextPiece.type];
-        nextCtx.shadowColor = `${COLORS[nextPiece.type]}80`;
-        nextCtx.shadowBlur = 4;
         
         const offsetX = (nextCanvas.width - blockSize * 4) / 2;
         const offsetY = (nextCanvas.height - blockSize * 4) / 2;
@@ -1166,7 +1152,6 @@
             blockSize - 1
           );
         });
-        nextCtx.shadowBlur = 0;
       }
     }
 
@@ -1219,12 +1204,12 @@
       if (gameState === 'gameOver' || gameState === 'initial') return;
       if (gameState === 'playing') {
         gameState = 'paused';
-        clearTimeout(gameLoopTimeout);
         document.getElementById('pauseBtn').textContent = '▶️ ПРОДОВЖИТИ';
       } else if (gameState === 'paused') {
         gameState = 'playing';
+        lastGameUpdateTime = 0;
         document.getElementById('pauseBtn').textContent = '⏸️ ПАУЗА';
-        loop();
+        requestAnimationFrame(loop);
       }
     }
 
@@ -1233,35 +1218,39 @@
       lines = 0;
       level = 1;
       gameState = 'playing';
+      lastGameUpdateTime = 0;
       initBoard();
       generatePiece();
       document.getElementById('score').innerText = score;
       document.getElementById('lines').innerText = lines;
       document.getElementById('level').innerText = level;
       document.getElementById('pauseBtn').textContent = '⏸️ ПАУЗА';
-      loop();
+      requestAnimationFrame(loop);
     }
+    
+    function loop(timestamp) {
+      const now = timestamp || Date.now();
+      const deltaTime = now - lastGameUpdateTime;
 
-    function loop() {
-      if (gameState === 'playing') {
+      if (gameState === 'playing' && deltaTime >= currentSpeed) {
         if (!currentPiece.move(0, 1)) {
           lockPiece();
         }
+        lastGameUpdateTime = now;
       }
       
       draw();
       drawNextPiece();
       updateParticles();
       
-      if (gameState !== 'paused' && gameState !== 'initial') {
-        gameLoopTimeout = setTimeout(loop, currentSpeed);
-      } else if (gameState !== 'initial') {
-        gameLoopTimeout = setTimeout(loop, 16);
+      if (gameState !== 'initial' && gameState !== 'gameOver') {
+        requestAnimationFrame(loop);
+      } else if (gameState === 'paused') {
+        requestAnimationFrame(loop);
       }
     }
 
     function endGame() {
-      clearTimeout(gameLoopTimeout);
       gameState = 'gameOver';
       const isNewRecord = score > highScore;
       
